@@ -354,6 +354,7 @@
         </div>
       </div>
 
+      <!-- ADM Monitoring Records & Filtering Section -->
       <div class="col-lg-7 d-none d-lg-block" id="admLogsCol">
         <div class="custom-card">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
@@ -362,6 +363,22 @@
               <i class="bi bi-file-earmark-excel me-1"></i> Export CSV
             </button>
           </div>
+
+          <!-- Filter & Search Controls for ADM -->
+          <div class="p-2 mb-3 rounded-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <input type="text" class="form-control form-control-sm" id="searchAdmTeacher" placeholder="🔍 Search teacher name..." oninput="filterAdmLogs()">
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filterAdmStartDate" onchange="filterAdmLogs()">
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filterAdmEndDate" onchange="filterAdmLogs()">
+              </div>
+            </div>
+          </div>
+
           <div id="admLogsContainer">Loading logs...</div>
         </div>
       </div>
@@ -417,7 +434,7 @@
             </button>
           </div>
 
-          <!-- Filter & Search Controls -->
+          <!-- Filter & Search Controls for Attendance -->
           <div class="p-2 mb-3 rounded-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
             <div class="row g-2">
               <div class="col-12 col-md-6">
@@ -717,7 +734,7 @@
     });
   }
 
-  // Load ADM Logs
+  // Load ADM Logs into raw array & render
   function loadAdmLogs() {
     const c = document.getElementById('admLogsContainer');
     c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading logs...</div>';
@@ -726,21 +743,45 @@
       .then(r => r.json())
       .then(data => {
         rawAdmData = data || [];
-        if(!data || !data.length) {
-          c.innerHTML = '<div class="text-muted text-center py-3">No logs found.</div>';
-          return;
-        }
-        c.innerHTML = data.map(r => `
-          <div class="record-card">
-            <div class="d-flex justify-content-between"><strong>${r.teacherName || ''}</strong><span class="badge bg-primary">${r.subject || ''}</span></div>
-            <div class="small text-muted mb-2">${r.activityDate || ''} (${r.timeSchedule || ''}) - ${r.gradeSection || ''}</div>
-            <a href="${r.movLink || '#'}" target="_blank" class="btn btn-sm btn-outline-primary w-100">View MOV Drive Link</a>
-          </div>
-        `).join('');
+        filterAdmLogs();
       })
       .catch(() => {
         c.innerHTML = '<div class="text-muted text-center py-3">Unable to load logs right now.</div>';
       });
+  }
+
+  // Live Search & Date Filter Function for ADM Monitoring Records
+  function filterAdmLogs() {
+    const search = document.getElementById('searchAdmTeacher').value.toLowerCase();
+    const startDate = document.getElementById('filterAdmStartDate').value;
+    const endDate = document.getElementById('filterAdmEndDate').value;
+    const c = document.getElementById('admLogsContainer');
+
+    const filtered = rawAdmData.filter(r => {
+      const matchName = (r.teacherName || '').toLowerCase().includes(search);
+      let matchDate = true;
+
+      const recDateStr = r.activityDate || (r.timestamp ? new Date(r.timestamp).toISOString().split('T')[0] : '');
+      if (recDateStr) {
+        if (startDate && recDateStr < startDate) matchDate = false;
+        if (endDate && recDateStr > endDate) matchDate = false;
+      }
+
+      return matchName && matchDate;
+    });
+
+    if (!filtered || !filtered.length) {
+      c.innerHTML = '<div class="text-muted text-center py-3">No matching ADM monitoring records found.</div>';
+      return;
+    }
+
+    c.innerHTML = filtered.map(r => `
+      <div class="record-card">
+        <div class="d-flex justify-content-between"><strong>${r.teacherName || ''}</strong><span class="badge bg-primary">${r.subject || ''}</span></div>
+        <div class="small text-muted mb-2">${r.activityDate || ''} (${r.timeSchedule || ''}) - ${r.gradeSection || ''}</div>
+        <a href="${r.movLink || '#'}" target="_blank" class="btn btn-sm btn-outline-primary w-100">View MOV Drive Link</a>
+      </div>
+    `).join('');
   }
 
   // Fetch Attendance Logs into raw array & render
@@ -759,7 +800,7 @@
       });
   }
 
-  // Live Search & Date Filter Function
+  // Live Search & Date Filter Function for Attendance
   function filterAttendanceLogs() {
     const search = document.getElementById('searchTeacher').value.toLowerCase();
     const startDate = document.getElementById('filterStartDate').value;
@@ -798,7 +839,7 @@
     `).join('');
   }
 
-  // Prompt Export Function (Sets target export type and shows password modal)
+  // Prompt Export Function
   function promptExport(type) {
     currentExportType = type;
     document.getElementById('adminPasswordInput').value = '';
