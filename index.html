@@ -277,6 +277,27 @@
   <option value="TORRE, EUCLID D."></option>
 </datalist>
 
+<!-- Sections List Datalist -->
+<datalist id="sectionOptions">
+  <option value="7 - Lavender"></option>
+  <option value="7 - Chamomile"></option>
+  <option value="7 - Silverbell"></option>
+  <option value="7 - Orchid"></option>
+  <option value="8 - Gratitude"></option>
+  <option value="8 - Compassion"></option>
+  <option value="8 - Integrity"></option>
+  <option value="8 - Wisdom"></option>
+  <option value="9 - Narra"></option>
+  <option value="9 - Dao"></option>
+  <option value="9 - Agoho"></option>
+  <option value="9 - Molave"></option>
+  <option value="10 - Rizal"></option>
+  <option value="10 - Bonifacio"></option>
+  <option value="10 - Jacinto"></option>
+  <option value="10 - Mabini"></option>
+  <option value="Combined Sections"></option>
+</datalist>
+
 <div class="app-container">
 
   <!-- Header Banner -->
@@ -361,7 +382,15 @@
               </div>
               <div class="col-6">
                 <label class="form-label">Section</label>
-                <input type="text" class="form-control" id="gradeSection" placeholder="10 - Rizal" required>
+                <input type="text" class="form-control" id="gradeSection" list="sectionOptions" placeholder="Select section..." required autocomplete="off" oninput="handleSectionInput(this)">
+              </div>
+            </div>
+
+            <!-- Combined Sections Selection Box (Shows when "Combined Sections" is selected) -->
+            <div id="combinedSectionsContainer" class="d-none p-2 mb-2 rounded border" style="background:#f8fafc; border-color:#cbd5e1 !important;">
+              <div class="small fw-bold text-primary mb-1"><i class="bi bi-check2-square me-1"></i> Select Combined Sections:</div>
+              <div class="row g-1" id="combinedCheckboxes">
+                <!-- Dynamically populated checkboxes -->
               </div>
             </div>
 
@@ -620,6 +649,51 @@
   let deferredPrompt = null;
   let pendingAttendancePayload = null;
 
+  const ALL_SECTIONS = [
+    "7 - Lavender", "7 - Chamomile", "7 - Silverbell", "7 - Orchid",
+    "8 - Gratitude", "8 - Compassion", "8 - Integrity", "8 - Wisdom",
+    "9 - Narra", "9 - Dao", "9 - Agoho", "9 - Molave",
+    "10 - Rizal", "10 - Bonifacio", "10 - Jacinto", "10 - Mabini"
+  ];
+
+  // Render Combined Sections Checkboxes
+  function initCombinedSectionsCheckboxes() {
+    const container = document.getElementById('combinedCheckboxes');
+    if (!container) return;
+    container.innerHTML = ALL_SECTIONS.map((sec, idx) => `
+      <div class="col-6">
+        <div class="form-check text-truncate small">
+          <input class="form-check-input combined-sec-chk" type="checkbox" value="${sec}" id="combSec_${idx}" onchange="updateCombinedSectionValue()">
+          <label class="form-check-label small" for="combSec_${idx}">${sec}</label>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Handle Section Combobox Change
+  function handleSectionInput(input) {
+    const container = document.getElementById('combinedSectionsContainer');
+    if (input.value === "Combined Sections") {
+      container.classList.remove('d-none');
+      updateCombinedSectionValue();
+    } else {
+      container.classList.add('d-none');
+    }
+  }
+
+  // Update input text with selected checkboxes for combined sections
+  function updateCombinedSectionValue() {
+    const chks = document.querySelectorAll('.combined-sec-chk:checked');
+    const selected = Array.from(chks).map(c => c.value);
+    const secInput = document.getElementById('gradeSection');
+    
+    if (selected.length > 0) {
+      secInput.value = "Combined: " + selected.join(", ");
+    } else {
+      secInput.value = "Combined Sections";
+    }
+  }
+
   // Toggle Drive Link Field disabled state based on "To Follow" checkbox
   function toggleToFollowLink(chk) {
     const driveInput = document.getElementById('attDriveLink');
@@ -682,6 +756,8 @@
     passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
     cautionModal = new bootstrap.Modal(document.getElementById('cautionModal'));
     confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+
+    initCombinedSectionsCheckboxes();
 
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
@@ -823,6 +899,15 @@
       return; // Stop form submission
     }
 
+    const secVal = document.getElementById('gradeSection').value;
+    if (secVal === "Combined Sections") {
+      showCautionModal(
+        "Select Combined Sections",
+        "Please select at least one section from the Combined Sections list before submitting."
+      );
+      return;
+    }
+
     const btn = document.getElementById('admSubmitBtn');
     btn.disabled = true; btn.innerText = "Submitting...";
 
@@ -833,7 +918,7 @@
         timeSchedule: document.getElementById('timeSchedule').value,
         teacherName: document.getElementById('teacherName').value,
         subject: document.getElementById('subject').value,
-        gradeSection: document.getElementById('gradeSection').value,
+        gradeSection: secVal,
         enrollment: enrollmentVal,
         activity: document.getElementById('activity').value,
         modular: modularVal,
@@ -853,6 +938,7 @@
     .then(() => {
       showCustomModal("Record Submitted!", "ADM Activity entry recorded successfully.");
       document.getElementById('monitoringForm').reset();
+      document.getElementById('combinedSectionsContainer').classList.add('d-none');
       btn.disabled = false; btn.innerText = "Submit ADM Record";
       setTimeout(loadAdmLogs, 1200);
       if (window.innerWidth < 992) switchAdmMobileView('logs');
