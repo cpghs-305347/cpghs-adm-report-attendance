@@ -414,7 +414,7 @@
           <form id="attendanceForm">
             <div class="mb-3">
               <label class="form-label">Teacher Name (Last, First M.I.)</label>
-              <input type="text" class="form-control" id="attTeacherName" placeholder="Solajes, Alfred B." required>
+              <input type="text" class="form-control" id="attTeacherName" placeholder="Dela Cruz, Juan B." required>
             </div>
             <div class="mb-3">
               <label class="form-label">Activity Lesson Drive Link <span class="text-muted fw-normal">(Optional for Time Out)</span></label>
@@ -485,8 +485,8 @@
         <div class="modal-status-icon-wrapper modal-icon-warning">
           <i class="bi bi-exclamation-triangle-fill fs-1"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-2" id="cautionTitle">Data Tally Exceeded</h5>
-        <p class="text-secondary small mb-3" id="cautionMessage">The total combined count of students exceeds the total enrollment number. Please review your numbers before proceeding.</p>
+        <h5 class="fw-bold text-dark mb-2" id="cautionTitle">Action Restricted</h5>
+        <p class="text-secondary small mb-3" id="cautionMessage">Please check your inputs before proceeding.</p>
         <button type="button" class="btn btn-warning text-white fw-bold w-100 py-2 fs-6" data-bs-dismiss="modal" style="background-color: #ea580c; border: none;">Review Entry</button>
       </div>
     </div>
@@ -764,7 +764,7 @@
     });
   });
 
-  // Submit Attendance (TIME IN / TIME OUT)
+  // Submit Attendance (TIME IN / TIME OUT) with Validation Restrictions
   function submitAttendance(type) {
     const tName = document.getElementById('attTeacherName').value.trim();
     const link = document.getElementById('attDriveLink').value.trim();
@@ -774,9 +774,67 @@
       return;
     }
 
-    if (type === 'TIME IN' && !link) {
-      showCustomModal("Missing Information", "Please attach Activity Drive Link for TIME IN.", false);
-      return;
+    const now = new Date();
+
+    if (type === 'TIME IN') {
+      // 5:30 AM Time Guardrail Check
+      const currentHour = now.getHours();
+      const currentMinutes = now.getMinutes();
+
+      // Disallow Time In if current time is before 5:30 AM (00:00 - 05:29)
+      if (currentHour < 5 || (currentHour === 5 && currentMinutes < 30)) {
+        showCautionModal(
+          "Time In Restricted",
+          "Official TIME IN is only allowed on or after 5:30 AM. Please wait for the official school opening time."
+        );
+        return;
+      }
+
+      if (!link) {
+        showCustomModal("Missing Information", "Please attach Activity Drive Link for TIME IN.", false);
+        return;
+      }
+    } else if (type === 'TIME OUT') {
+      // Find the most recent TIME IN record for this teacher
+      const teacherLogs = rawAttendanceData.filter(r => 
+        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && 
+        r.logType === 'TIME IN'
+      );
+
+      if (!teacherLogs || teacherLogs.length === 0) {
+        showCautionModal(
+          "TIME IN Required First",
+          "You must TIME IN first before recording a TIME OUT. No active Time In record was found for your name."
+        );
+        return;
+      }
+
+      // Sort logs by timestamp descending to get latest Time In
+      teacherLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      const latestTimeIn = new Date(teacherLogs[0].timestamp);
+
+      if (isNaN(latestTimeIn.getTime())) {
+        // Fallback if date string is unparseable
+      } else {
+        const timeDiffMs = now.getTime() - latestTimeIn.getTime();
+        const sixHoursMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+
+        if (timeDiffMs < sixHoursMs) {
+          const remainingMs = sixHoursMs - timeDiffMs;
+          const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
+          const remainingMins = Math.ceil((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+
+          let timeStr = "";
+          if (remainingHours > 0) timeStr += `${remainingHours} hr `;
+          timeStr += `${remainingMins} min`;
+
+          showCautionModal(
+            "6 Hours Completion Required",
+            `TIME OUT is only allowed after completing a full 6 hours from your TIME IN. Please wait another ${timeStr} before timing out.`
+          );
+          return;
+        }
+      }
     }
 
     const payload = {
@@ -847,7 +905,7 @@
     }
 
     c.innerHTML = filtered.map(r => {
-      // Calculate engagement tally vs enrollment for Progress Bar (Modular + Online/FB Messenger/Text + No Response + Excused)
+      // Calculate engagement tally vs enrollment for Progress Bar
       const totalEnrollment = parseInt(r.enrollment || 0) || 0;
       const modularCount = parseInt(r.modular || 0) || 0;
       const onlineCount = parseInt(r.online || 0) || 0;
