@@ -231,6 +231,7 @@
     .modal-icon-error { background-color: #fee2e2; color: #dc2626; }
     .modal-icon-info { background-color: #e0f2fe; color: #0284c7; }
     .modal-icon-security { background-color: #fef3c7; color: #d97706; }
+    .modal-icon-warning { background-color: #ffedd5; color: #c2410c; }
 
     @media (min-width: 992px) {
       .sub-nav-tabs { display: none !important; }
@@ -330,7 +331,7 @@
 
             <div class="mb-2">
               <label class="form-label">Total Enrollment</label>
-              <input type="number" class="form-control" id="enrollment" value="40" required>
+              <input type="number" class="form-control" id="enrollment" value="40" min="1" required>
             </div>
 
             <div class="mb-2">
@@ -340,10 +341,10 @@
 
             <div class="p-2 mb-2 rounded" style="background:#f8fafc; border:1px dashed #cbd5e1;">
               <div class="row g-2">
-                <div class="col-6"><label class="small text-success fw-bold">Modular</label><input type="number" class="form-control" id="modular" value="0"></div>
-                <div class="col-6"><label class="small text-primary fw-bold">Online/FB Messenger/Text</label><input type="number" class="form-control" id="online" value="0"></div>
-                <div class="col-6"><label class="small text-warning fw-bold">No Resp.</label><input type="number" class="form-control" id="noResponse" value="0"></div>
-                <div class="col-6"><label class="small text-danger fw-bold">Excused</label><input type="number" class="form-control" id="excused" value="0"></div>
+                <div class="col-6"><label class="small text-success fw-bold">Modular</label><input type="number" class="form-control" id="modular" value="0" min="0"></div>
+                <div class="col-6"><label class="small text-primary fw-bold">Online/FB Messenger/Text</label><input type="number" class="form-control" id="online" value="0" min="0"></div>
+                <div class="col-6"><label class="small text-warning fw-bold">No Resp.</label><input type="number" class="form-control" id="noResponse" value="0" min="0"></div>
+                <div class="col-6"><label class="small text-danger fw-bold">Excused</label><input type="number" class="form-control" id="excused" value="0" min="0"></div>
               </div>
             </div>
 
@@ -476,6 +477,22 @@
   </div>
 </div>
 
+<!-- Caution / Validation Pop-Up Modal -->
+<div class="modal fade" id="cautionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div class="modal-status-icon-wrapper modal-icon-warning">
+          <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" id="cautionTitle">Data Tally Exceeded</h5>
+        <p class="text-secondary small mb-3" id="cautionMessage">The total combined count of students exceeds the total enrollment number. Please review your numbers before proceeding.</p>
+        <button type="button" class="btn btn-warning text-white fw-bold w-100 py-2 fs-6" data-bs-dismiss="modal" style="background-color: #ea580c; border: none;">Review Entry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Custom Admin Password Auth Modal -->
 <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
@@ -527,7 +544,7 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal, installModal, passwordModal;
+  let statusModal, installModal, passwordModal, cautionModal;
   let rawAttendanceData = [];
   let rawAdmData = [];
   let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
@@ -580,6 +597,7 @@
     statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
     installModal = new bootstrap.Modal(document.getElementById('installModal'));
     passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+    cautionModal = new bootstrap.Modal(document.getElementById('cautionModal'));
 
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
@@ -645,6 +663,12 @@
     statusModal.show();
   }
 
+  function showCautionModal(title, message) {
+    document.getElementById('cautionTitle').innerText = title;
+    document.getElementById('cautionMessage').innerText = message;
+    cautionModal.show();
+  }
+
   function switchMainTab(tab) {
     if(tab==='adm') {
       document.getElementById('admTabContent').classList.remove('d-none');
@@ -679,9 +703,27 @@
     if (v === 'logs') loadAttLogs();
   }
 
-  // Submit ADM Form
+  // Submit ADM Form with Strict Tally vs Enrollment Check
   document.getElementById('monitoringForm').addEventListener('submit', function(e) {
     e.preventDefault();
+
+    const enrollmentVal = parseInt(document.getElementById('enrollment').value || 0);
+    const modularVal = parseInt(document.getElementById('modular').value || 0);
+    const onlineVal = parseInt(document.getElementById('online').value || 0);
+    const noResponseVal = parseInt(document.getElementById('noResponse').value || 0);
+    const excusedVal = parseInt(document.getElementById('excused').value || 0);
+
+    const totalProcessed = modularVal + onlineVal + noResponseVal + excusedVal;
+
+    // Strict Tally Guardrail Check
+    if (totalProcessed > enrollmentVal) {
+      showCautionModal(
+        "Invalid Data Tally",
+        `The sum of student records (${totalProcessed}) exceeds the Total Enrollment (${enrollmentVal}). Please correct the entries before submitting.`
+      );
+      return; // Stop form submission
+    }
+
     const btn = document.getElementById('admSubmitBtn');
     btn.disabled = true; btn.innerText = "Submitting...";
 
@@ -693,12 +735,12 @@
         teacherName: document.getElementById('teacherName').value,
         subject: document.getElementById('subject').value,
         gradeSection: document.getElementById('gradeSection').value,
-        enrollment: document.getElementById('enrollment').value,
+        enrollment: enrollmentVal,
         activity: document.getElementById('activity').value,
-        modular: document.getElementById('modular').value,
-        online: document.getElementById('online').value,
-        noResponse: document.getElementById('noResponse').value,
-        excused: document.getElementById('excused').value,
+        modular: modularVal,
+        online: onlineVal,
+        noResponse: noResponseVal,
+        excused: excusedVal,
         movLink: document.getElementById('movLink').value
       }
     };
