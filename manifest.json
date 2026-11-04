@@ -1,6 +1,6 @@
 {
   "name": "CPGHS ADM & Attendance",
-  "short_name": "CPGHS App",
+  "short_name": "CPGHS-ADM",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0284c7",
