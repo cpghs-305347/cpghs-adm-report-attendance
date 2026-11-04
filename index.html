@@ -209,7 +209,7 @@
       margin-bottom: 10px;
     }
 
-    /* Modal Styling */
+    /* Custom Modal Window Styling */
     .modal-content-custom {
       border: none;
       border-radius: 20px;
@@ -230,6 +230,7 @@
     .modal-icon-success { background-color: #dcfce7; color: #16a34a; }
     .modal-icon-error { background-color: #fee2e2; color: #dc2626; }
     .modal-icon-info { background-color: #e0f2fe; color: #0284c7; }
+    .modal-icon-security { background-color: #fef3c7; color: #d97706; }
 
     @media (min-width: 992px) {
       .sub-nav-tabs { display: none !important; }
@@ -355,7 +356,12 @@
 
       <div class="col-lg-7 d-none d-lg-block" id="admLogsCol">
         <div class="custom-card">
-          <div class="form-section-title"><i class="bi bi-table"></i> Monitoring Records</div>
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+            <div class="form-section-title mb-0 border-0 p-0"><i class="bi bi-table"></i> Monitoring Records</div>
+            <button class="btn btn-sm btn-outline-success fw-bold" onclick="promptExport('ADM')">
+              <i class="bi bi-file-earmark-excel me-1"></i> Export CSV
+            </button>
+          </div>
           <div id="admLogsContainer">Loading logs...</div>
         </div>
       </div>
@@ -406,7 +412,7 @@
         <div class="custom-card">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
             <div class="form-section-title mb-0 border-0 p-0"><i class="bi bi-clock-history"></i> Attendance History</div>
-            <button class="btn btn-sm btn-outline-success fw-bold" onclick="exportAttendanceCSV()">
+            <button class="btn btn-sm btn-outline-success fw-bold" onclick="promptExport('ATTENDANCE')">
               <i class="bi bi-file-earmark-excel me-1"></i> Export CSV
             </button>
           </div>
@@ -450,6 +456,35 @@
   </div>
 </div>
 
+<!-- Custom Admin Password Auth Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div class="modal-status-icon-wrapper modal-icon-security">
+          <i class="bi bi-shield-lock-fill fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-1">Admin Security Check</h5>
+        <p class="text-secondary small mb-3">Please enter the admin password to download records:</p>
+        
+        <form id="adminAuthForm" onsubmit="handlePasswordVerification(event)">
+          <div class="mb-3">
+            <input type="password" class="form-control text-center fs-5 fw-bold" id="adminPasswordInput" placeholder="••••" required autofocus style="letter-spacing: 4px;">
+          </div>
+          <div class="row g-2">
+            <div class="col-6">
+              <button type="button" class="btn btn-light border w-100 py-2 fs-6 fw-bold" data-bs-dismiss="modal">Cancel</button>
+            </div>
+            <div class="col-6">
+              <button type="submit" class="btn btn-custom-blue w-100 py-2 fs-6">OK</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Install Instructions Modal -->
 <div class="modal fade" id="installModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
@@ -472,8 +507,10 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal, installModal;
+  let statusModal, installModal, passwordModal;
   let rawAttendanceData = [];
+  let rawAdmData = [];
+  let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
   let deferredPrompt = null;
 
   // Capture Android PWA install prompt
@@ -496,6 +533,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
     installModal = new bootstrap.Modal(document.getElementById('installModal'));
+    passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
 
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
@@ -687,6 +725,7 @@
     fetch(SCRIPT_URL + "?action=getADM")
       .then(r => r.json())
       .then(data => {
+        rawAdmData = data || [];
         if(!data || !data.length) {
           c.innerHTML = '<div class="text-muted text-center py-3">No logs found.</div>';
           return;
@@ -759,21 +798,78 @@
     `).join('');
   }
 
-  // CSV Export Function with Admin Password Protection (1111)
-  function exportAttendanceCSV() {
+  // Prompt Export Function (Sets target export type and shows password modal)
+  function promptExport(type) {
+    currentExportType = type;
+    document.getElementById('adminPasswordInput').value = '';
+    passwordModal.show();
+  }
+
+  // Handle Custom Password Form Submission & Route to Correct CSV Generator
+  function handlePasswordVerification(e) {
+    e.preventDefault();
     const ADMIN_PASSWORD = "1111";
+    const inputPass = document.getElementById('adminPasswordInput').value;
 
-    const userPassword = prompt("🔐 Admin Security Check\nPlease enter the admin password to download attendance records:");
-    
-    if (userPassword === null || userPassword.trim() === "") {
-      return; 
-    }
+    passwordModal.hide();
 
-    if (userPassword !== ADMIN_PASSWORD) {
-      showCustomModal("Access Denied", "Incorrect admin password. Download aborted.", false);
+    if (inputPass !== ADMIN_PASSWORD) {
+      setTimeout(() => {
+        showCustomModal("Access Denied", "Incorrect admin password. Download aborted.", false);
+      }, 300);
       return;
     }
 
+    setTimeout(() => {
+      if (currentExportType === 'ADM') {
+        exportADMCSV();
+      } else if (currentExportType === 'ATTENDANCE') {
+        exportAttendanceCSV();
+      }
+    }, 300);
+  }
+
+  // CSV Generator for ADM Logs
+  function exportADMCSV() {
+    if (!rawAdmData || !rawAdmData.length) {
+      showCustomModal("Export Error", "No ADM data available to download.", false);
+      return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,Timestamp,Activity Date,Time Schedule,Teacher Name,Subject,Grade & Section,Enrollment,Activity / Topic,Modular,Online,No Response,Excused,Total Engaged,Progress,MOV Link\n";
+
+    rawAdmData.forEach(row => {
+      const line = [
+        `"${row.timestamp || ''}"`,
+        `"${row.activityDate || ''}"`,
+        `"${row.timeSchedule || ''}"`,
+        `"${row.teacherName || ''}"`,
+        `"${row.subject || ''}"`,
+        `"${row.gradeSection || ''}"`,
+        `"${row.enrollment || 0}"`,
+        `"${(row.activity || '').replace(/"/g, '""')}"`,
+        `"${row.modular || 0}"`,
+        `"${row.online || 0}"`,
+        `"${row.noResponse || 0}"`,
+        `"${row.excused || 0}"`,
+        `"${row.totalEngaged || 0}"`,
+        `"${row.progressBar || '0%'}"`,
+        `"${row.movLink || ''}"`
+      ].join(",");
+      csvContent += line + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `CPGHS_ADM_Monitoring_Report_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // CSV Generator for Attendance Logs
+  function exportAttendanceCSV() {
     if (!rawAttendanceData || !rawAttendanceData.length) {
       showCustomModal("Export Error", "No attendance data available to download.", false);
       return;
