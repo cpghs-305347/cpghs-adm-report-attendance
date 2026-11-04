@@ -241,6 +241,42 @@
 </head>
 <body>
 
+<!-- Master Shared Teacher List Datalist -->
+<datalist id="teacherOptions">
+  <option value="ABAD, MARY CRIS C."></option>
+  <option value="ABE, ANGELICA AMOR M."></option>
+  <option value="ARATAN, MARICRIS M."></option>
+  <option value="ARENDAIN, JOHN ARVIN S."></option>
+  <option value="ASIS, LOREI MAE C."></option>
+  <option value="BOLIVAR, SYLVETH D."></option>
+  <option value="BONDAD, MA. APRIL G."></option>
+  <option value="CARESOSA, EARL N."></option>
+  <option value="CUNANAN, ARLENE T."></option>
+  <option value="DELA CRUZ, LYN B."></option>
+  <option value="FADRIGORE, JOSELITO D."></option>
+  <option value="FERRER, CHERRY A."></option>
+  <option value="GARCIA, JUSTINE L."></option>
+  <option value="JUADIONG, LEA C."></option>
+  <option value="LAFORTEZA, AIZA MAE M."></option>
+  <option value="LARIOSA JR, JAIME C."></option>
+  <option value="LITA, JUDY B."></option>
+  <option value="LORESCO, RHYAN B."></option>
+  <option value="LUSTICA, LALAINE S."></option>
+  <option value="MARGALLO, GINA A."></option>
+  <option value="MIRANDA, ANANIA T."></option>
+  <option value="MORALES, MARICHRIS B."></option>
+  <option value="ORIS, HELEN S."></option>
+  <option value="PEÑAFLOR II, HOMER T."></option>
+  <option value="RAFAEL, MARK ANTHONY D."></option>
+  <option value="RUIZ, MARY ANN C."></option>
+  <option value="SACUROM, TERESITA C."></option>
+  <option value="SANTIAGO, AGNES M."></option>
+  <option value="SISTONA, JUNALYN L."></option>
+  <option value="SOLAJES, ALFRED B."></option>
+  <option value="TAN, AGNES G."></option>
+  <option value="TORRE, EUCLID D."></option>
+</datalist>
+
 <div class="app-container">
 
   <!-- Header Banner -->
@@ -306,7 +342,7 @@
 
             <div class="mb-2">
               <label class="form-label">Teacher Name (Last, First M.I.)</label>
-              <input type="text" class="form-control" id="teacherName" placeholder="Dela Cruz, Juan B." required>
+              <input type="text" class="form-control" id="teacherName" list="teacherOptions" placeholder="Select or type teacher name..." required autocomplete="off">
             </div>
 
             <div class="row g-2 mb-2">
@@ -414,7 +450,7 @@
           <form id="attendanceForm">
             <div class="mb-3">
               <label class="form-label">Teacher Name (Last, First M.I.)</label>
-              <input type="text" class="form-control" id="attTeacherName" placeholder="Dela Cruz, Juan B." required>
+              <input type="text" class="form-control" id="attTeacherName" list="teacherOptions" placeholder="Select or type teacher name..." required autocomplete="off">
             </div>
             <div class="mb-3">
               <label class="form-label">Activity Lesson Drive Link <span class="text-muted fw-normal">(Optional for Time Out)</span></label>
@@ -477,7 +513,7 @@
   </div>
 </div>
 
-<!-- Caution / Validation Pop-Up Modal -->
+<!-- Caution / Validation Pop-Up Modal (OK only) -->
 <div class="modal fade" id="cautionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -488,6 +524,29 @@
         <h5 class="fw-bold text-dark mb-2" id="cautionTitle">Action Restricted</h5>
         <p class="text-secondary small mb-3" id="cautionMessage">Please check your inputs before proceeding.</p>
         <button type="button" class="btn btn-warning text-white fw-bold w-100 py-2 fs-6" data-bs-dismiss="modal" style="background-color: #ea580c; border: none;">Review Entry</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Caution Confirm Modal (Confirm / Cancel) -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div class="modal-status-icon-wrapper modal-icon-warning">
+          <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" id="confirmTitle">Confirm Duplicate Time In</h5>
+        <p class="text-secondary small mb-3" id="confirmMessage">You already have timed in within the last 6 hours. Are you sure you want to proceed?</p>
+        <div class="row g-2">
+          <div class="col-6">
+            <button type="button" class="btn btn-light border w-100 py-2 fs-6 fw-bold" data-bs-dismiss="modal">Cancel</button>
+          </div>
+          <div class="col-6">
+            <button type="button" class="btn btn-warning text-white fw-bold w-100 py-2 fs-6" id="confirmProceedBtn" style="background-color: #ea580c; border: none;">Confirm</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -544,11 +603,12 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal, installModal, passwordModal, cautionModal;
+  let statusModal, installModal, passwordModal, cautionModal, confirmModal;
   let rawAttendanceData = [];
   let rawAdmData = [];
   let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
   let deferredPrompt = null;
+  let pendingAttendancePayload = null;
 
   // Helper to format clean readable dates and strip GMT text strings
   function formatCleanDate(dateInput) {
@@ -598,11 +658,20 @@
     installModal = new bootstrap.Modal(document.getElementById('installModal'));
     passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
     cautionModal = new bootstrap.Modal(document.getElementById('cautionModal'));
+    confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
 
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
     loadAdmLogs();
     loadAttLogs();
+
+    document.getElementById('confirmProceedBtn').addEventListener('click', () => {
+      confirmModal.hide();
+      if (pendingAttendancePayload) {
+        executeAttendanceSubmission(pendingAttendancePayload.type, pendingAttendancePayload.tName, pendingAttendancePayload.payload);
+        pendingAttendancePayload = null;
+      }
+    });
   });
 
   // App Download Trigger Logic for iOS & Android
@@ -667,6 +736,13 @@
     document.getElementById('cautionTitle').innerText = title;
     document.getElementById('cautionMessage').innerText = message;
     cautionModal.show();
+  }
+
+  function showConfirmModal(title, message, onConfirmData) {
+    document.getElementById('confirmTitle').innerText = title;
+    document.getElementById('confirmMessage').innerText = message;
+    pendingAttendancePayload = onConfirmData;
+    confirmModal.show();
   }
 
   function switchMainTab(tab) {
@@ -770,18 +846,18 @@
     const link = document.getElementById('attDriveLink').value.trim();
 
     if (!tName) {
-      showCustomModal("Missing Information", "Please enter Teacher Name.", false);
+      showCustomModal("Missing Information", "Please select or type Teacher Name.", false);
       return;
     }
 
     const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
 
     if (type === 'TIME IN') {
-      // 5:30 AM Time Guardrail Check
+      // 1. Check if official time is before 5:30 AM
       const currentHour = now.getHours();
       const currentMinutes = now.getMinutes();
 
-      // Disallow Time In if current time is before 5:30 AM (00:00 - 05:29)
       if (currentHour < 5 || (currentHour === 5 && currentMinutes < 30)) {
         showCautionModal(
           "Time In Restricted",
@@ -790,10 +866,68 @@
         return;
       }
 
+      // 2. Check if the teacher has ALREADY timed out today
+      const todayTimeOutLogs = rawAttendanceData.filter(r => {
+        const isSameTeacher = (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase();
+        const isTimeOut = r.logType === 'TIME OUT';
+        let isToday = false;
+        if (r.timestamp) {
+          const logDate = new Date(r.timestamp).toISOString().split('T')[0];
+          isToday = (logDate === todayStr);
+        }
+        return isSameTeacher && isTimeOut && isToday;
+      });
+
+      if (todayTimeOutLogs.length > 0) {
+        showCautionModal(
+          "Attendance Completed Today",
+          "You have already recorded a TIME OUT for today. Additional TIME IN is not allowed today. Please wait for tomorrow after 5:30 AM."
+        );
+        return;
+      }
+
       if (!link) {
         showCustomModal("Missing Information", "Please attach Activity Drive Link for TIME IN.", false);
         return;
       }
+
+      // 3. Check if teacher has timed in within the last 6 hours
+      const teacherTimeInLogs = rawAttendanceData.filter(r => 
+        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && 
+        r.logType === 'TIME IN'
+      );
+
+      const payload = {
+        action: "submitAttendance",
+        data: { 
+          logType: type, 
+          teacherName: tName, 
+          driveLink: link || 'N/A' 
+        }
+      };
+
+      if (teacherTimeInLogs.length > 0) {
+        teacherTimeInLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        const latestTimeIn = new Date(teacherTimeInLogs[0].timestamp);
+
+        if (!isNaN(latestTimeIn.getTime())) {
+          const timeDiffMs = now.getTime() - latestTimeIn.getTime();
+          const sixHoursMs = 6 * 60 * 60 * 1000;
+
+          if (timeDiffMs < sixHoursMs) {
+            showConfirmModal(
+              "Already Timed In",
+              "You already have timed in within the last 6 hours. Are you sure you want to proceed?",
+              { type: type, tName: tName, payload: payload }
+            );
+            return;
+          }
+        }
+      }
+
+      // Proceed directly if no recent time-in conflict
+      executeAttendanceSubmission(type, tName, payload);
+
     } else if (type === 'TIME OUT') {
       // Find the most recent TIME IN record for this teacher
       const teacherLogs = rawAttendanceData.filter(r => 
@@ -813,11 +947,9 @@
       teacherLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       const latestTimeIn = new Date(teacherLogs[0].timestamp);
 
-      if (isNaN(latestTimeIn.getTime())) {
-        // Fallback if date string is unparseable
-      } else {
+      if (!isNaN(latestTimeIn.getTime())) {
         const timeDiffMs = now.getTime() - latestTimeIn.getTime();
-        const sixHoursMs = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+        const sixHoursMs = 6 * 60 * 60 * 1000;
 
         if (timeDiffMs < sixHoursMs) {
           const remainingMs = sixHoursMs - timeDiffMs;
@@ -835,17 +967,22 @@
           return;
         }
       }
+
+      const payload = {
+        action: "submitAttendance",
+        data: { 
+          logType: type, 
+          teacherName: tName, 
+          driveLink: link || 'N/A' 
+        }
+      };
+
+      executeAttendanceSubmission(type, tName, payload);
     }
+  }
 
-    const payload = {
-      action: "submitAttendance",
-      data: { 
-        logType: type, 
-        teacherName: tName, 
-        driveLink: link || 'N/A' 
-      }
-    };
-
+  // Execute actual submission to backend
+  function executeAttendanceSubmission(type, tName, payload) {
     fetch(SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
