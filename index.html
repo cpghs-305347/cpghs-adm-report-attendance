@@ -452,10 +452,20 @@
               <label class="form-label">Teacher Name (Last, First M.I.)</label>
               <input type="text" class="form-control" id="attTeacherName" list="teacherOptions" placeholder="Select or type teacher name..." required autocomplete="off">
             </div>
+
+            <!-- Activity Lesson Drive Link Input + To Follow Checkbox -->
             <div class="mb-3">
               <label class="form-label">Activity Lesson Drive Link <span class="text-muted fw-normal">(Optional for Time Out)</span></label>
               <input type="url" class="form-control" id="attDriveLink" placeholder="https://drive.google.com/...">
+              
+              <div class="form-check mt-2">
+                <input class="form-check-input" type="checkbox" id="toFollowCheck" onchange="toggleToFollowLink(this)">
+                <label class="form-check-input-label text-secondary small fw-bold" for="toFollowCheck">
+                  <i class="bi bi-clock-history me-1 text-warning"></i> Activity Drive Link is not available (To Follow)
+                </label>
+              </div>
             </div>
+
             <div class="row g-2">
               <div class="col-6"><button type="button" class="btn btn-time-in w-100" onclick="submitAttendance('TIME IN')">TIME IN</button></div>
               <div class="col-6"><button type="button" class="btn btn-time-out w-100" onclick="submitAttendance('TIME OUT')">TIME OUT</button></div>
@@ -609,6 +619,19 @@
   let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
   let deferredPrompt = null;
   let pendingAttendancePayload = null;
+
+  // Toggle Drive Link Field disabled state based on "To Follow" checkbox
+  function toggleToFollowLink(chk) {
+    const driveInput = document.getElementById('attDriveLink');
+    if (chk.checked) {
+      driveInput.value = "";
+      driveInput.disabled = true;
+      driveInput.placeholder = "Link set to 'To Follow'";
+    } else {
+      driveInput.disabled = false;
+      driveInput.placeholder = "https://drive.google.com/...";
+    }
+  }
 
   // Helper to format clean readable dates and strip GMT text strings
   function formatCleanDate(dateInput) {
@@ -843,7 +866,12 @@
   // Submit Attendance (TIME IN / TIME OUT) with Validation Restrictions
   function submitAttendance(type) {
     const tName = document.getElementById('attTeacherName').value.trim();
-    const link = document.getElementById('attDriveLink').value.trim();
+    const isToFollow = document.getElementById('toFollowCheck').checked;
+    let link = document.getElementById('attDriveLink').value.trim();
+
+    if (isToFollow) {
+      link = "To Follow";
+    }
 
     if (!tName) {
       showCustomModal("Missing Information", "Please select or type Teacher Name.", false);
@@ -887,7 +915,7 @@
       }
 
       if (!link) {
-        showCustomModal("Missing Information", "Please attach Activity Drive Link for TIME IN.", false);
+        showCustomModal("Missing Information", "Please attach Activity Drive Link or check 'To Follow'.", false);
         return;
       }
 
@@ -902,7 +930,7 @@
         data: { 
           logType: type, 
           teacherName: tName, 
-          driveLink: link || 'N/A' 
+          driveLink: link || 'To Follow' 
         }
       };
 
@@ -992,6 +1020,11 @@
     .then(() => {
       showCustomModal(type + " Recorded Successfully!", "Record saved for " + tName + ".", true);
       document.getElementById('attendanceForm').reset();
+      
+      // Reset To Follow checkbox state
+      const chk = document.getElementById('toFollowCheck');
+      if (chk) { chk.checked = false; toggleToFollowLink(chk); }
+
       setTimeout(loadAttLogs, 1200);
       if (window.innerWidth < 992) switchAttMobileView('logs');
     })
@@ -1138,18 +1171,30 @@
       return;
     }
 
-    c.innerHTML = filtered.map(r => `
-      <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
-        <div class="d-flex justify-content-between align-items-center mb-1">
-          <strong>${r.teacherName || ''}</strong>
-          <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
+    c.innerHTML = filtered.map(r => {
+      const isToFollow = r.driveLink === 'To Follow';
+      const isNoLink = r.driveLink === 'N/A' || !r.driveLink;
+
+      return `
+        <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong>${r.teacherName || ''}</strong>
+            <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
+          </div>
+          <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
+          
+          ${isToFollow ? `
+            <button class="btn btn-sm btn-outline-warning text-dark fw-bold w-100" disabled>
+              <i class="bi bi-clock-history me-1"></i> Activity Drive Link (To Follow)
+            </button>
+          ` : `
+            <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100 ${isNoLink?'disabled':''}">
+              ${isNoLink ? 'No Link Attached' : 'Open Activity Link'}
+            </a>
+          `}
         </div>
-        <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
-        <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100 ${r.driveLink==='N/A'?'disabled':''}">
-          ${r.driveLink==='N/A' ? 'No Link Attached' : 'Open Activity Link'}
-        </a>
-      </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   // Prompt Export Function
