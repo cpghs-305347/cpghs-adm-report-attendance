@@ -759,8 +759,21 @@
     `).join('');
   }
 
-  // CSV Export Function
+  // CSV Export Function with Admin Password Protection (1111)
   function exportAttendanceCSV() {
+    const ADMIN_PASSWORD = "1111";
+
+    const userPassword = prompt("🔐 Admin Security Check\nPlease enter the admin password to download attendance records:");
+    
+    if (userPassword === null || userPassword.trim() === "") {
+      return; 
+    }
+
+    if (userPassword !== ADMIN_PASSWORD) {
+      showCustomModal("Access Denied", "Incorrect admin password. Download aborted.", false);
+      return;
+    }
+
     if (!rawAttendanceData || !rawAttendanceData.length) {
       showCustomModal("Export Error", "No attendance data available to download.", false);
       return;
