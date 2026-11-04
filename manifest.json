@@ -1,0 +1,20 @@
+{
+  "name": "CPGHS ADM & Attendance",
+  "short_name": "CPGHS App",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0284c7",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "https://raw.githubusercontent.com/cpghs-305347/cpghs-new-logo/main/cpghs%20new%20logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://raw.githubusercontent.com/cpghs-305347/cpghs-new-logo/main/cpghs%20new%20logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
