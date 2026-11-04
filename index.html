@@ -145,6 +145,34 @@
       margin-bottom: 10px;
     }
 
+    /* Custom Modal Window Styling */
+    .modal-content-custom {
+      border: none;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2);
+      overflow: hidden;
+    }
+
+    .modal-status-icon-wrapper {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+    }
+
+    .modal-icon-success {
+      background-color: #dcfce7;
+      color: #16a34a;
+    }
+
+    .modal-icon-error {
+      background-color: #fee2e2;
+      color: #dc2626;
+    }
+
     @media (min-width: 992px) {
       .sub-nav-tabs { display: none !important; }
       #admFormCol, #admLogsCol, #attFormCol, #attLogsCol { display: block !important; }
@@ -287,11 +315,11 @@
           <form id="attendanceForm">
             <div class="mb-3">
               <label class="form-label">Teacher Name (Last, First M.I.)</label>
-              <input type="text" class="form-control" id="attTeacherName" required>
+              <input type="text" class="form-control" id="attTeacherName" placeholder="Solajes, Alfred B." required>
             </div>
             <div class="mb-3">
               <label class="form-label">Activity Lesson Drive Link</label>
-              <input type="url" class="form-control" id="attDriveLink" required>
+              <input type="url" class="form-control" id="attDriveLink" placeholder="https://drive.google.com/..." required>
             </div>
             <div class="row g-2">
               <div class="col-6"><button type="button" class="btn btn-time-in w-100" onclick="submitAttendance('TIME IN')">TIME IN</button></div>
@@ -312,9 +340,27 @@
 
 </div>
 
+<!-- Custom Pop-Up Modal Window -->
+<div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div id="modalIconContainer" class="modal-status-icon-wrapper modal-icon-success">
+          <i id="modalIcon" class="bi bi-check-circle-fill fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" id="modalTitle">TIME IN Recorded Successfully!</h5>
+        <p class="text-secondary small mb-3" id="modalMessage">Your attendance log has been recorded.</p>
+        <button type="button" class="btn btn-custom-blue w-100 py-2 fs-6" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
-  // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE:
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
+  let statusModal;
 
   function updateClock() {
     const clockTimeEl = document.getElementById('clockTime');
@@ -328,11 +374,32 @@
   setInterval(updateClock, 1000); updateClock();
 
   document.addEventListener('DOMContentLoaded', () => {
+    statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
     loadAdmLogs();
     loadAttLogs();
   });
+
+  function showCustomModal(title, message, isSuccess = true) {
+    const titleEl = document.getElementById('modalTitle');
+    const msgEl = document.getElementById('modalMessage');
+    const iconContainer = document.getElementById('modalIconContainer');
+    const icon = document.getElementById('modalIcon');
+
+    titleEl.innerText = title;
+    msgEl.innerText = message;
+
+    if (isSuccess) {
+      iconContainer.className = "modal-status-icon-wrapper modal-icon-success";
+      icon.className = "bi bi-check-circle-fill fs-1";
+    } else {
+      iconContainer.className = "modal-status-icon-wrapper modal-icon-error";
+      icon.className = "bi bi-exclamation-triangle-fill fs-1";
+    }
+
+    statusModal.show();
+  }
 
   function switchMainTab(tab) {
     if(tab==='adm') {
@@ -399,25 +466,25 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      alert("ADM Record Submitted!");
+      showCustomModal("Record Submitted!", "ADM Activity entry recorded successfully.");
       document.getElementById('monitoringForm').reset();
       btn.disabled = false; btn.innerText = "Submit ADM Record";
       setTimeout(loadAdmLogs, 1200);
       if (window.innerWidth < 992) switchAdmMobileView('logs');
     })
     .catch(err => {
-      alert("Error submitting record. Please check your connection.");
+      showCustomModal("Submission Failed", "Unable to log ADM entry.", false);
       btn.disabled = false; btn.innerText = "Submit ADM Record";
     });
   });
 
-  // Submit Attendance
+  // Submit Attendance (TIME IN / TIME OUT)
   function submitAttendance(type) {
     const tName = document.getElementById('attTeacherName').value.trim();
     const link = document.getElementById('attDriveLink').value.trim();
 
     if (!tName || !link) {
-      alert("Please fill in Teacher Name and Activity Drive Link!");
+      showCustomModal("Missing Information", "Please fill in Teacher Name and Drive Link.", false);
       return;
     }
 
@@ -433,13 +500,13 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      alert(type + " Recorded Successfully!");
+      showCustomModal(type + " Recorded Successfully!", "Record saved for " + tName + ".", true);
       document.getElementById('attendanceForm').reset();
       setTimeout(loadAttLogs, 1200);
       if (window.innerWidth < 992) switchAttMobileView('logs');
     })
     .catch(err => {
-      alert("Error saving attendance record.");
+      showCustomModal("Error", "Could not record attendance. Please try again.", false);
     });
   }
 
