@@ -145,7 +145,7 @@
       margin-bottom: 10px;
     }
 
-    /* Custom Modal Window Styling */
+    /* Custom Pop-Up Modal Window Styling */
     .modal-content-custom {
       border: none;
       border-radius: 20px;
@@ -318,8 +318,8 @@
               <input type="text" class="form-control" id="attTeacherName" placeholder="Solajes, Alfred B." required>
             </div>
             <div class="mb-3">
-              <label class="form-label">Activity Lesson Drive Link</label>
-              <input type="url" class="form-control" id="attDriveLink" placeholder="https://drive.google.com/..." required>
+              <label class="form-label">Activity Lesson Drive Link <span class="text-muted fw-normal">(Optional for Time Out)</span></label>
+              <input type="url" class="form-control" id="attDriveLink" placeholder="https://drive.google.com/...">
             </div>
             <div class="row g-2">
               <div class="col-6"><button type="button" class="btn btn-time-in w-100" onclick="submitAttendance('TIME IN')">TIME IN</button></div>
@@ -483,14 +483,23 @@
     const tName = document.getElementById('attTeacherName').value.trim();
     const link = document.getElementById('attDriveLink').value.trim();
 
-    if (!tName || !link) {
-      showCustomModal("Missing Information", "Please fill in Teacher Name and Drive Link.", false);
+    if (!tName) {
+      showCustomModal("Missing Information", "Please enter Teacher Name.", false);
+      return;
+    }
+
+    if (type === 'TIME IN' && !link) {
+      showCustomModal("Missing Information", "Please attach Activity Drive Link for TIME IN.", false);
       return;
     }
 
     const payload = {
       action: "submitAttendance",
-      data: { logType: type, teacherName: tName, driveLink: link }
+      data: { 
+        logType: type, 
+        teacherName: tName, 
+        driveLink: link || 'N/A' 
+      }
     };
 
     fetch(SCRIPT_URL, {
@@ -554,8 +563,8 @@
               <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
             </div>
             <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
-            <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100">
-              Open Activity Link
+            <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100 ${r.driveLink==='N/A'?'disabled':''}">
+              ${r.driveLink==='N/A' ? 'No Link Attached' : 'Open Activity Link'}
             </a>
           </div>
         `).join('');
