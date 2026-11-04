@@ -66,7 +66,8 @@
     .header-title-text h1 { font-size: 0.95rem; font-weight: 800; margin: 0; }
     .header-title-text h2 { font-size: 0.78rem; color: var(--light-yellow); font-weight: 700; margin: 2px 0 0 0; }
 
-    .nav-tabs-container, .sub-nav-tabs {
+    /* Primary Navigation Tabs */
+    .nav-tabs-container {
       background: #e0f2fe;
       padding: 4px;
       border-radius: 12px;
@@ -74,6 +75,47 @@
       gap: 4px;
       margin-bottom: 12px;
       border: 1px solid #bae6fd;
+    }
+
+    /* Sub Navigation Tabs Base */
+    .sub-nav-tabs {
+      padding: 4px;
+      border-radius: 12px;
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    /* ADM Sub-Tabs (Teal & Cyan Palette) */
+    .sub-nav-adm {
+      background: #ccfbf1;
+      border: 1px solid #99f6e4;
+    }
+
+    .sub-nav-adm .tab-btn {
+      color: #0f766e;
+    }
+
+    .sub-nav-adm .tab-btn.active {
+      background: #0d9488;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+    }
+
+    /* Attendance Sub-Tabs (Amber & Warm Orange Palette) */
+    .sub-nav-att {
+      background: #fef3c7;
+      border: 1px solid #fde68a;
+    }
+
+    .sub-nav-att .tab-btn {
+      color: #b45309;
+    }
+
+    .sub-nav-att .tab-btn.active {
+      background: #d97706;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
     }
 
     .tab-btn {
@@ -89,9 +131,10 @@
       align-items: center;
       justify-content: center;
       gap: 5px;
+      transition: all 0.2s ease;
     }
 
-    .tab-btn.active {
+    .nav-tabs-container .tab-btn.active {
       background: #ffffff;
       color: var(--header-blue);
       box-shadow: 0 2px 6px rgba(2, 132, 199, 0.18);
@@ -128,7 +171,7 @@
 
     .form-control, .form-select {
       font-size: 0.95rem !important;
-      min-height: 46px;
+      min-height: 44px;
       border-radius: 10px;
       background-color: #f8fafc;
     }
@@ -145,7 +188,7 @@
       margin-bottom: 10px;
     }
 
-    /* Custom Pop-Up Modal Window Styling */
+    /* Modal Styling */
     .modal-content-custom {
       border: none;
       border-radius: 20px;
@@ -163,15 +206,8 @@
       margin-bottom: 12px;
     }
 
-    .modal-icon-success {
-      background-color: #dcfce7;
-      color: #16a34a;
-    }
-
-    .modal-icon-error {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
+    .modal-icon-success { background-color: #dcfce7; color: #16a34a; }
+    .modal-icon-error { background-color: #fee2e2; color: #dc2626; }
 
     @media (min-width: 992px) {
       .sub-nav-tabs { display: none !important; }
@@ -204,9 +240,13 @@
 
   <!-- MODULE 1: ADM SYSTEM -->
   <div id="admTabContent">
-    <div class="sub-nav-tabs d-flex d-lg-none">
-      <button class="tab-btn active" id="subAdmFormBtn" onclick="switchAdmMobileView('form')">Form</button>
-      <button class="tab-btn" id="subAdmLogsBtn" onclick="switchAdmMobileView('logs')">Logs History</button>
+    <div class="sub-nav-tabs sub-nav-adm d-flex d-lg-none">
+      <button class="tab-btn active" id="subAdmFormBtn" onclick="switchAdmMobileView('form')">
+        <i class="bi bi-pencil-square"></i> ADM Form
+      </button>
+      <button class="tab-btn" id="subAdmLogsBtn" onclick="switchAdmMobileView('logs')">
+        <i class="bi bi-list-columns-reverse"></i> Logs History
+      </button>
     </div>
 
     <div class="row g-3">
@@ -269,10 +309,10 @@
 
             <div class="p-2 mb-2 rounded" style="background:#f8fafc; border:1px dashed #cbd5e1;">
               <div class="row g-2">
-                <div class="col-6"><label class="small text-success">Modular</label><input type="number" class="form-control" id="modular" value="0"></div>
-                <div class="col-6"><label class="small text-primary">Online</label><input type="number" class="form-control" id="online" value="0"></div>
-                <div class="col-6"><label class="small text-warning">No Resp.</label><input type="number" class="form-control" id="noResponse" value="0"></div>
-                <div class="col-6"><label class="small text-danger">Excused</label><input type="number" class="form-control" id="excused" value="0"></div>
+                <div class="col-6"><label class="small text-success fw-bold">Modular</label><input type="number" class="form-control" id="modular" value="0"></div>
+                <div class="col-6"><label class="small text-primary fw-bold">Online</label><input type="number" class="form-control" id="online" value="0"></div>
+                <div class="col-6"><label class="small text-warning fw-bold">No Resp.</label><input type="number" class="form-control" id="noResponse" value="0"></div>
+                <div class="col-6"><label class="small text-danger fw-bold">Excused</label><input type="number" class="form-control" id="excused" value="0"></div>
               </div>
             </div>
 
@@ -297,12 +337,17 @@
 
   <!-- MODULE 2: TEACHER ATTENDANCE -->
   <div id="teacherTabContent" class="d-none">
-    <div class="sub-nav-tabs d-flex d-lg-none">
-      <button class="tab-btn active" id="subAttFormBtn" onclick="switchAttMobileView('form')">Clock In/Out</button>
-      <button class="tab-btn" id="subAttLogsBtn" onclick="switchAttMobileView('logs')">Attendance Logs</button>
+    <div class="sub-nav-tabs sub-nav-att d-flex d-lg-none">
+      <button class="tab-btn active" id="subAttFormBtn" onclick="switchAttMobileView('form')">
+        <i class="bi bi-alarm"></i> Clock In/Out
+      </button>
+      <button class="tab-btn" id="subAttLogsBtn" onclick="switchAttMobileView('logs')">
+        <i class="bi bi-clock-history"></i> Attendance Logs
+      </button>
     </div>
 
     <div class="row g-3">
+      <!-- Attendance Form -->
       <div class="col-lg-5" id="attFormCol">
         <div class="custom-card">
           <div class="form-section-title"><i class="bi bi-alarm"></i> Teacher Time In / Out</div>
@@ -329,9 +374,31 @@
         </div>
       </div>
 
+      <!-- Attendance Logs & Filtering / Export Section -->
       <div class="col-lg-7 d-none d-lg-block" id="attLogsCol">
         <div class="custom-card">
-          <div class="form-section-title"><i class="bi bi-clock-history"></i> Attendance History</div>
+          <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
+            <div class="form-section-title mb-0 border-0 p-0"><i class="bi bi-clock-history"></i> Attendance History</div>
+            <button class="btn btn-sm btn-outline-success fw-bold" onclick="exportAttendanceCSV()">
+              <i class="bi bi-file-earmark-excel me-1"></i> Export CSV
+            </button>
+          </div>
+
+          <!-- Filter & Search Controls -->
+          <div class="p-2 mb-3 rounded-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+            <div class="row g-2">
+              <div class="col-12 col-md-6">
+                <input type="text" class="form-control form-control-sm" id="searchTeacher" placeholder="🔍 Search teacher name..." oninput="filterAttendanceLogs()">
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filterStartDate" onchange="filterAttendanceLogs()">
+              </div>
+              <div class="col-6 col-md-3">
+                <input type="date" class="form-control form-control-sm" id="filterEndDate" onchange="filterAttendanceLogs()">
+              </div>
+            </div>
+          </div>
+
           <div id="attLogsContainer">Loading logs...</div>
         </div>
       </div>
@@ -361,6 +428,7 @@
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
   let statusModal;
+  let rawAttendanceData = []; // Store attendance logs for filtering & CSV export
 
   function updateClock() {
     const clockTimeEl = document.getElementById('clockTime');
@@ -544,7 +612,7 @@
       });
   }
 
-  // Load Attendance Logs
+  // Fetch Attendance Logs into raw array & render
   function loadAttLogs() {
     const c = document.getElementById('attLogsContainer');
     c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading attendance logs...</div>';
@@ -552,26 +620,79 @@
     fetch(SCRIPT_URL + "?action=getAttendance")
       .then(r => r.json())
       .then(data => {
-        if(!data || !data.length) {
-          c.innerHTML = '<div class="text-muted text-center py-3">No attendance logs available.</div>';
-          return;
-        }
-        c.innerHTML = data.map(r => `
-          <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-              <strong>${r.teacherName || ''}</strong>
-              <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
-            </div>
-            <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
-            <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100 ${r.driveLink==='N/A'?'disabled':''}">
-              ${r.driveLink==='N/A' ? 'No Link Attached' : 'Open Activity Link'}
-            </a>
-          </div>
-        `).join('');
+        rawAttendanceData = data || [];
+        filterAttendanceLogs();
       })
       .catch(() => {
         c.innerHTML = '<div class="text-muted text-center py-3">Unable to load attendance logs.</div>';
       });
+  }
+
+  // Live Search & Date Filter Function
+  function filterAttendanceLogs() {
+    const search = document.getElementById('searchTeacher').value.toLowerCase();
+    const startDate = document.getElementById('filterStartDate').value;
+    const endDate = document.getElementById('filterEndDate').value;
+    const c = document.getElementById('attLogsContainer');
+
+    const filtered = rawAttendanceData.filter(r => {
+      const matchName = (r.teacherName || '').toLowerCase().includes(search);
+      let matchDate = true;
+
+      if (r.timestamp) {
+        const logDateStr = new Date(r.timestamp).toISOString().split('T')[0];
+        if (startDate && logDateStr < startDate) matchDate = false;
+        if (endDate && logDateStr > endDate) matchDate = false;
+      }
+
+      return matchName && matchDate;
+    });
+
+    if (!filtered || !filtered.length) {
+      c.innerHTML = '<div class="text-muted text-center py-3">No matching attendance records found.</div>';
+      return;
+    }
+
+    c.innerHTML = filtered.map(r => `
+      <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <strong>${r.teacherName || ''}</strong>
+          <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
+        </div>
+        <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
+        <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100 ${r.driveLink==='N/A'?'disabled':''}">
+          ${r.driveLink==='N/A' ? 'No Link Attached' : 'Open Activity Link'}
+        </a>
+      </div>
+    `).join('');
+  }
+
+  // CSV Export Function
+  function exportAttendanceCSV() {
+    if (!rawAttendanceData || !rawAttendanceData.length) {
+      showCustomModal("Export Error", "No attendance data available to download.", false);
+      return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,Timestamp,Log Type,Teacher Name,Drive Link\n";
+
+    rawAttendanceData.forEach(row => {
+      const line = [
+        `"${row.timestamp || ''}"`,
+        `"${row.logType || ''}"`,
+        `"${row.teacherName || ''}"`,
+        `"${row.driveLink || ''}"`
+      ].join(",");
+      csvContent += line + "\n";
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `CPGHS_Teacher_Attendance_${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 </script>
 </body>
