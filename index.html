@@ -536,6 +536,28 @@
 
 </div>
 
+<!-- Portal PIN Security Lock Screen Modal -->
+<div class="modal fade" id="pinLockModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div class="modal-status-icon-wrapper modal-icon-security">
+          <i class="bi bi-shield-lock-fill fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-1">CPGHS Portal Access</h5>
+        <p class="text-secondary small mb-3">Enter Security PIN to unlock the dashboard:</p>
+        
+        <form id="pinAuthForm" onsubmit="handlePortalPinVerification(event)">
+          <div class="mb-3">
+            <input type="password" class="form-control text-center fs-4 fw-bold" id="portalPinInput" maxlength="6" placeholder="••••" required autofocus style="letter-spacing: 6px;">
+          </div>
+          <button type="submit" class="btn btn-custom-blue w-100 py-2 fs-6" id="pinSubmitBtn">Unlock Dashboard</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Custom Pop-Up Status Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
@@ -642,7 +664,7 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal, installModal, passwordModal, cautionModal, confirmModal;
+  let statusModal, installModal, passwordModal, cautionModal, confirmModal, pinLockModal;
   let rawAttendanceData = [];
   let rawAdmData = [];
   let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
@@ -756,6 +778,12 @@
     passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
     cautionModal = new bootstrap.Modal(document.getElementById('cautionModal'));
     confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    pinLockModal = new bootstrap.Modal(document.getElementById('pinLockModal'));
+
+    // Check session security authentication
+    if (!sessionStorage.getItem('portalUnlocked')) {
+      pinLockModal.show();
+    }
 
     initCombinedSectionsCheckboxes();
 
@@ -772,6 +800,43 @@
       }
     });
   });
+
+  // Handle Portal Lock Screen PIN Submission
+  function handlePortalPinVerification(e) {
+    e.preventDefault();
+    const inputPin = document.getElementById('portalPinInput').value;
+    const btn = document.getElementById('pinSubmitBtn');
+    btn.disabled = true;
+    btn.innerText = "Verifying...";
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({
+        action: "verifyPin",
+        data: { pin: inputPin }
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "success") {
+        sessionStorage.setItem('portalUnlocked', 'true');
+        pinLockModal.hide();
+        btn.disabled = false;
+        btn.innerText = "Unlock Dashboard";
+      } else {
+        showCautionModal("Access Denied", "Incorrect PIN entered. Access restricted.");
+        document.getElementById('portalPinInput').value = "";
+        btn.disabled = false;
+        btn.innerText = "Unlock Dashboard";
+      }
+    })
+    .catch(() => {
+      showCautionModal("Connection Error", "Unable to verify PIN. Please check your internet connection.");
+      btn.disabled = false;
+      btn.innerText = "Unlock Dashboard";
+    });
+  }
 
   // App Download Trigger Logic for iOS & Android
   function triggerAppInstall() {
