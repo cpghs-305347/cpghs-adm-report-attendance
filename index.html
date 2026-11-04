@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/cpghs-305347/cpghs-new-logo/main/cpghs%20new%20logo.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="CPGHS-ADM">
+  <meta name="apple-mobile-web-app-title" content="CPGHS ADM">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   
   <title>CARLOS P. GARCIA HIGH SCHOOL - ADM & Attendance</title>
@@ -72,6 +72,27 @@
     .header-title-text h1 { font-size: 0.95rem; font-weight: 800; margin: 0; }
     .header-title-text h2 { font-size: 0.78rem; color: var(--light-yellow); font-weight: 700; margin: 2px 0 0 0; }
 
+    /* Download App Banner Button */
+    .btn-download-app {
+      background: #ffffff;
+      color: #0284c7;
+      border: 1.5px solid #38bdf8;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 6px 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+
+    .btn-download-app:active {
+      transform: scale(0.97);
+    }
+
     /* Primary Navigation Tabs */
     .nav-tabs-container {
       background: #e0f2fe;
@@ -98,10 +119,7 @@
       border: 1px solid #99f6e4;
     }
 
-    .sub-nav-adm .tab-btn {
-      color: #0f766e;
-    }
-
+    .sub-nav-adm .tab-btn { color: #0f766e; }
     .sub-nav-adm .tab-btn.active {
       background: #0d9488;
       color: #ffffff;
@@ -114,10 +132,7 @@
       border: 1px solid #fde68a;
     }
 
-    .sub-nav-att .tab-btn {
-      color: #b45309;
-    }
-
+    .sub-nav-att .tab-btn { color: #b45309; }
     .sub-nav-att .tab-btn.active {
       background: #d97706;
       color: #ffffff;
@@ -214,6 +229,7 @@
 
     .modal-icon-success { background-color: #dcfce7; color: #16a34a; }
     .modal-icon-error { background-color: #fee2e2; color: #dc2626; }
+    .modal-icon-info { background-color: #e0f2fe; color: #0284c7; }
 
     @media (min-width: 992px) {
       .sub-nav-tabs { display: none !important; }
@@ -232,6 +248,11 @@
       <h1>CARLOS P. GARCIA HIGH SCHOOL</h1>
       <h2>ADM & Attendance System</h2>
     </div>
+    
+    <!-- Download App Button -->
+    <button class="btn-download-app" onclick="triggerAppInstall()">
+      <i class="bi bi-download"></i> Download App (iOS / Android)
+    </button>
   </div>
 
   <!-- Primary Navigation -->
@@ -413,7 +434,7 @@
 
 </div>
 
-<!-- Custom Pop-Up Modal Window -->
+<!-- Custom Pop-Up Status Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -429,12 +450,37 @@
   </div>
 </div>
 
+<!-- Install Instructions Modal -->
+<div class="modal fade" id="installModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm px-3">
+    <div class="modal-content modal-content-custom text-center p-3">
+      <div class="modal-body p-2">
+        <div class="modal-status-icon-wrapper modal-icon-info">
+          <i class="bi bi-phone-vibrate fs-1"></i>
+        </div>
+        <h5 class="fw-bold text-dark mb-2" id="installTitle">Install CPGHS ADM App</h5>
+        <div class="text-secondary small text-start mb-3" id="installBody">
+          <!-- Dynamically populated via JS for iOS / Android -->
+        </div>
+        <button type="button" class="btn btn-custom-blue w-100 py-2 fs-6" data-bs-dismiss="modal">Got it!</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal;
+  let statusModal, installModal;
   let rawAttendanceData = [];
+  let deferredPrompt = null;
+
+  // Capture Android PWA install prompt
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+  });
 
   function updateClock() {
     const clockTimeEl = document.getElementById('clockTime');
@@ -449,11 +495,51 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+    installModal = new bootstrap.Modal(document.getElementById('installModal'));
+
     const dateInput = document.getElementById('activityDate');
     if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
     loadAdmLogs();
     loadAttLogs();
   });
+
+  // App Download Trigger Logic for iOS & Android
+  function triggerAppInstall() {
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        deferredPrompt = null;
+      });
+      return;
+    }
+
+    const installBody = document.getElementById('installBody');
+    const installTitle = document.getElementById('installTitle');
+
+    if (isIOS) {
+      installTitle.innerText = "Install on iOS (iPhone/iPad)";
+      installBody.innerHTML = `
+        <ol class="ps-3 mb-0">
+          <li class="mb-2">Tap the <strong>Share button</strong> <i class="bi bi-share text-primary"></i> at the bottom of Safari.</li>
+          <li class="mb-2">Scroll down and tap <strong>Add to Home Screen</strong> <i class="bi bi-plus-square text-primary"></i>.</li>
+          <li>Tap <strong>Add</strong> at top right to complete!</li>
+        </ol>
+      `;
+    } else {
+      installTitle.innerText = "Install on Android";
+      installBody.innerHTML = `
+        <ol class="ps-3 mb-0">
+          <li class="mb-2">Tap the <strong>3 dots menu</strong> <i class="bi bi-three-dots-vertical text-primary"></i> in Chrome.</li>
+          <li class="mb-2">Select <strong>Add to Home Screen</strong> or <strong>Install App</strong>.</li>
+          <li>Tap <strong>Install</strong> to add to your app launcher!</li>
+        </ol>
+      `;
+    }
+
+    installModal.show();
+  }
 
   function showCustomModal(title, message, isSuccess = true) {
     const titleEl = document.getElementById('modalTitle');
