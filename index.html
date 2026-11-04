@@ -1,57 +1,72 @@
-// PASTE YOUR WEBPAPP URL HERE
+<script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
 
+  // Clock Functionality
   function updateClock() {
-    const now = new Date();
-    document.getElementById('clockTime').innerText = now.toLocaleTimeString();
-    document.getElementById('clockDate').innerText = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
+    const clockTimeEl = document.getElementById('clockTime');
+    const clockDateEl = document.getElementById('clockDate');
+    if (clockTimeEl && clockDateEl) {
+      const now = new Date();
+      clockTimeEl.innerText = now.toLocaleTimeString();
+      clockDateEl.innerText = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    }
   }
-  setInterval(updateClock, 1000); updateClock();
+  setInterval(updateClock, 1000);
+  updateClock();
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('activityDate').value = new Date().toISOString().split('T')[0];
+    const dateInput = document.getElementById('activityDate');
+    if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
     loadAdmLogs();
     loadAttLogs();
   });
 
+  // Tab Switchers
   function switchMainTab(tab) {
-    if(tab==='adm') {
-      document.getElementById('admTabContent').classList.remove('d-none');
-      document.getElementById('teacherTabContent').classList.add('d-none');
-      document.getElementById('tabAdmBtn').classList.add('active');
-      document.getElementById('tabTeacherBtn').classList.remove('active');
+    const admContent = document.getElementById('admTabContent');
+    const teacherContent = document.getElementById('teacherTabContent');
+    const tabAdmBtn = document.getElementById('tabAdmBtn');
+    const tabTeacherBtn = document.getElementById('tabTeacherBtn');
+
+    if (tab === 'adm') {
+      admContent.classList.remove('d-none');
+      teacherContent.classList.add('d-none');
+      tabAdmBtn.classList.add('active');
+      tabTeacherBtn.classList.remove('active');
+      loadAdmLogs();
     } else {
-      document.getElementById('admTabContent').classList.add('d-none');
-      document.getElementById('teacherTabContent').classList.remove('d-none');
-      document.getElementById('tabAdmBtn').classList.remove('active');
-      document.getElementById('tabTeacherBtn').classList.add('active');
+      admContent.classList.add('d-none');
+      teacherContent.classList.remove('d-none');
+      tabAdmBtn.classList.remove('active');
+      tabTeacherBtn.classList.add('active');
       loadAttLogs();
     }
   }
 
   function switchAdmMobileView(v) {
-    document.getElementById('admFormCol').classList.toggle('d-none', v!=='form');
-    document.getElementById('admLogsCol').classList.toggle('d-none', v!=='logs');
+    document.getElementById('admFormCol').classList.toggle('d-none', v !== 'form');
+    document.getElementById('admLogsCol').classList.toggle('d-none', v !== 'logs');
     document.getElementById('admLogsCol').classList.remove('d-lg-block');
-    document.getElementById('subAdmFormBtn').classList.toggle('active', v==='form');
-    document.getElementById('subAdmLogsBtn').classList.toggle('active', v==='logs');
+    document.getElementById('subAdmFormBtn').classList.toggle('active', v === 'form');
+    document.getElementById('subAdmLogsBtn').classList.toggle('active', v === 'logs');
     if (v === 'logs') loadAdmLogs();
   }
 
   function switchAttMobileView(v) {
-    document.getElementById('attFormCol').classList.toggle('d-none', v!=='form');
-    document.getElementById('attLogsCol').classList.toggle('d-none', v!=='logs');
+    document.getElementById('attFormCol').classList.toggle('d-none', v !== 'form');
+    document.getElementById('attLogsCol').classList.toggle('d-none', v !== 'logs');
     document.getElementById('attLogsCol').classList.remove('d-lg-block');
-    document.getElementById('subAttFormBtn').classList.toggle('active', v==='form');
-    document.getElementById('subAttLogsBtn').classList.toggle('active', v==='logs');
+    document.getElementById('subAttFormBtn').classList.toggle('active', v === 'form');
+    document.getElementById('subAttLogsBtn').classList.toggle('active', v === 'logs');
     if (v === 'logs') loadAttLogs();
   }
 
-  // Submit ADM Form via text/plain to bypass CORS Preflight
+  // Submit ADM Form
   document.getElementById('monitoringForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const btn = document.getElementById('admSubmitBtn');
-    btn.disabled = true; btn.innerText = "Submitting...";
+    btn.disabled = true;
+    btn.innerText = "Submitting...";
 
     const payload = {
       action: "submitADM",
@@ -73,31 +88,34 @@
 
     fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     })
-    .then(r => r.json())
-    .then(res => {
-      alert(res.message || "ADM Logged!");
+    .then(() => {
+      alert("ADM Record Submitted!");
       document.getElementById('monitoringForm').reset();
-      btn.disabled = false; btn.innerText = "Submit ADM Record";
-      loadAdmLogs();
-      if(window.innerWidth < 992) switchAdmMobileView('logs');
+      btn.disabled = false;
+      btn.innerText = "Submit ADM Record";
+      setTimeout(loadAdmLogs, 1200);
+      if (window.innerWidth < 992) switchAdmMobileView('logs');
     })
     .catch(err => {
-      alert("Record Submitted!");
-      document.getElementById('monitoringForm').reset();
-      btn.disabled = false; btn.innerText = "Submit ADM Record";
-      setTimeout(loadAdmLogs, 1500);
-      if(window.innerWidth < 992) switchAdmMobileView('logs');
+      alert("Error submitting record. Please check your connection.");
+      btn.disabled = false;
+      btn.innerText = "Submit ADM Record";
     });
   });
 
-  // Submit Attendance via text/plain
+  // Submit Attendance
   function submitAttendance(type) {
     const tName = document.getElementById('attTeacherName').value.trim();
     const link = document.getElementById('attDriveLink').value.trim();
-    if(!tName || !link) return alert("Please fill in Teacher Name and Activity Drive Link!");
+
+    if (!tName || !link) {
+      alert("Please fill in Teacher Name and Activity Drive Link!");
+      return;
+    }
 
     const payload = {
       action: "submitAttendance",
@@ -106,61 +124,76 @@
 
     fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
       body: JSON.stringify(payload)
     })
-    .then(r => r.json())
-    .then(res => {
-      alert(res.message || (type + " Logged!"));
+    .then(() => {
+      alert(type + " Recorded Successfully!");
       document.getElementById('attendanceForm').reset();
-      loadAttLogs();
-      if(window.innerWidth < 992) switchAttMobileView('logs');
+      setTimeout(loadAttLogs, 1200);
+      if (window.innerWidth < 992) switchAttMobileView('logs');
     })
     .catch(err => {
-      alert(type + " Logged!");
-      document.getElementById('attendanceForm').reset();
-      setTimeout(loadAttLogs, 1500);
-      if(window.innerWidth < 992) switchAttMobileView('logs');
+      alert("Error saving attendance record.");
     });
   }
 
   // Load ADM Logs
   function loadAdmLogs() {
+    const c = document.getElementById('admLogsContainer');
+    c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading logs...</div>';
+
     fetch(SCRIPT_URL + "?action=getADM")
       .then(r => r.json())
       .then(data => {
-        const c = document.getElementById('admLogsContainer');
-        if(!data || !data.length) return c.innerHTML = '<div class="text-muted text-center py-3">No logs found.</div>';
+        if (!data || !data.length) {
+          c.innerHTML = '<div class="text-muted text-center py-3">No logs found.</div>';
+          return;
+        }
         c.innerHTML = data.map(r => `
           <div class="record-card">
-            <div class="d-flex justify-content-between"><strong>${r.teacherName}</strong><span class="badge bg-primary">${r.subject}</span></div>
-            <div class="small text-muted mb-2">${r.activityDate} (${r.timeSchedule}) - ${r.gradeSection}</div>
-            <a href="${r.movLink}" target="_blank" class="btn btn-sm btn-outline-primary w-100">View MOV Drive Link</a>
+            <div class="d-flex justify-content-between">
+              <strong>${r.teacherName || ''}</strong>
+              <span class="badge bg-primary">${r.subject || ''}</span>
+            </div>
+            <div class="small text-muted mb-2">${r.activityDate || ''} (${r.timeSchedule || ''}) - ${r.gradeSection || ''}</div>
+            <a href="${r.movLink || '#'}" target="_blank" class="btn btn-sm btn-outline-primary w-100">View MOV Drive Link</a>
           </div>
         `).join('');
       })
-      .catch(e => console.log(e));
+      .catch(() => {
+        c.innerHTML = '<div class="text-muted text-center py-3">Unable to load logs right now.</div>';
+      });
   }
 
   // Load Attendance Logs
   function loadAttLogs() {
+    const c = document.getElementById('attLogsContainer');
+    c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading attendance logs...</div>';
+
     fetch(SCRIPT_URL + "?action=getAttendance")
       .then(r => r.json())
       .then(data => {
-        const c = document.getElementById('attLogsContainer');
-        if(!data || !data.length) return c.innerHTML = '<div class="text-muted text-center py-3">No attendance logs available.</div>';
+        if (!data || !data.length) {
+          c.innerHTML = '<div class="text-muted text-center py-3">No attendance logs available.</div>';
+          return;
+        }
         c.innerHTML = data.map(r => `
-          <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
+          <div class="record-card border-start border-4 ${r.logType === 'TIME IN' ? 'border-success' : 'border-danger'}">
             <div class="d-flex justify-content-between align-items-center mb-1">
-              <strong>${r.teacherName}</strong>
-              <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType}</span>
+              <strong>${r.teacherName || ''}</strong>
+              <span class="badge ${r.logType === 'TIME IN' ? 'bg-success' : 'bg-danger'}">${r.logType || ''}</span>
             </div>
-            <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp}</div>
-            <a href="${r.driveLink}" target="_blank" class="btn btn-sm btn-light border text-primary w-100">
+            <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
+            <a href="${r.driveLink || '#'}" target="_blank" class="btn btn-sm btn-light border text-primary w-100">
               Open Activity Link
             </a>
           </div>
         `).join('');
       })
-      .catch(e => console.log(e));
+      .catch(() => {
+        c.innerHTML = '<div class="text-muted text-center py-3">Unable to load attendance logs.</div>';
+      });
   }
+</script>
