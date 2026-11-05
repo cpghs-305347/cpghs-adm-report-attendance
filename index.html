@@ -87,7 +87,6 @@
 
     .btn-download-app:active { transform: scale(0.97); }
 
-    /* Primary Navigation Container */
     .nav-tabs-container {
       background: #f1f5f9;
       padding: 5px;
@@ -112,7 +111,6 @@
       transition: all 0.2s ease;
     }
 
-    /* Color Distinction for Main Tabs */
     .tab-btn-adm {
       background: #ccfbf1;
       color: #0f766e;
@@ -137,7 +135,6 @@
       box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35);
     }
 
-    /* Sub Navigation Tabs */
     .sub-nav-tabs {
       padding: 4px;
       border-radius: 12px;
@@ -215,6 +212,15 @@
       padding: 2px 8px;
       border-radius: 6px;
       font-weight: 600;
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
     }
 
     .modal-content-custom {
@@ -316,7 +322,6 @@
     </button>
   </div>
 
-  <!-- Distinct Color Navigation Tabs -->
   <div class="nav-tabs-container">
     <button class="tab-btn tab-btn-adm active" id="tabAdmBtn" onclick="switchMainTab('adm')">
       <i class="bi bi-journal-text"></i> ADM System
@@ -446,6 +451,17 @@
           </div>
 
           <div id="admLogsContainer">Loading logs...</div>
+          
+          <!-- ADM Pagination Controls -->
+          <div class="pagination-container" id="admPaginationControls">
+            <button class="btn btn-sm btn-outline-primary fw-bold" id="admPrevBtn" onclick="changeAdmPage(-1)">
+              <i class="bi bi-chevron-left me-1"></i> Previous
+            </button>
+            <span class="small fw-bold text-secondary" id="admPageIndicator">Page 1 of 1</span>
+            <button class="btn btn-sm btn-outline-primary fw-bold" id="admNextBtn" onclick="changeAdmPage(1)">
+              Next <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -522,6 +538,17 @@
           </div>
 
           <div id="attLogsContainer">Loading logs...</div>
+
+          <!-- Attendance Pagination Controls -->
+          <div class="pagination-container" id="attPaginationControls">
+            <button class="btn btn-sm btn-outline-warning text-dark fw-bold" id="attPrevBtn" onclick="changeAttPage(-1)">
+              <i class="bi bi-chevron-left me-1"></i> Previous
+            </button>
+            <span class="small fw-bold text-secondary" id="attPageIndicator">Page 1 of 1</span>
+            <button class="btn btn-sm btn-outline-warning text-dark fw-bold" id="attNextBtn" onclick="changeAttPage(1)">
+              Next <i class="bi bi-chevron-right ms-1"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -718,6 +745,13 @@
   let currentExportType = "";
   let deferredPrompt = null;
   let pendingAttendancePayload = null;
+
+  // Pagination Variables (10 items per page)
+  const PAGE_SIZE = 10;
+  let currentAdmPage = 1;
+  let currentAttPage = 1;
+  let filteredAdmData = [];
+  let filteredAttData = [];
 
   const ALL_SECTIONS = [
     "7 - Lavender", "7 - Chamomile", "7 - Silverbell", "7 - Orchid",
@@ -1158,9 +1192,8 @@
     const search = document.getElementById('searchAdmTeacher').value.toLowerCase();
     const startDate = document.getElementById('filterAdmStartDate').value;
     const endDate = document.getElementById('filterAdmEndDate').value;
-    const c = document.getElementById('admLogsContainer');
 
-    const filtered = rawAdmData.filter(r => {
+    filteredAdmData = rawAdmData.filter(r => {
       const matchName = (r.teacherName || '').toLowerCase().includes(search);
       let matchDate = true;
       const recDateStr = r.activityDate || (r.timestamp ? new Date(r.timestamp).toISOString().split('T')[0] : '');
@@ -1171,12 +1204,31 @@
       return matchName && matchDate;
     });
 
-    if (!filtered || !filtered.length) {
+    currentAdmPage = 1;
+    renderAdmPage();
+  }
+
+  function renderAdmPage() {
+    const c = document.getElementById('admLogsContainer');
+    const paginationControls = document.getElementById('admPaginationControls');
+
+    if (!filteredAdmData || !filteredAdmData.length) {
       c.innerHTML = '<div class="text-muted text-center py-3">No matching ADM monitoring records found.</div>';
+      paginationControls.classList.add('d-none');
       return;
     }
 
-    c.innerHTML = filtered.map((r, index) => {
+    paginationControls.classList.remove('d-none');
+    const totalPages = Math.ceil(filteredAdmData.length / PAGE_SIZE);
+    
+    if (currentAdmPage < 1) currentAdmPage = 1;
+    if (currentAdmPage > totalPages) currentAdmPage = totalPages;
+
+    const startIdx = (currentAdmPage - 1) * PAGE_SIZE;
+    const pageItems = filteredAdmData.slice(startIdx, startIdx + PAGE_SIZE);
+
+    c.innerHTML = pageItems.map((r) => {
+      const originalIndex = rawAdmData.indexOf(r);
       const totalEnrollment = parseInt(r.enrollment || 0) || 0;
       const modularCount = parseInt(r.modular || 0) || 0;
       const onlineCount = parseInt(r.online || 0) || 0;
@@ -1196,7 +1248,7 @@
           <div class="d-flex justify-content-between align-items-center mb-1">
             <div>
               <strong>${r.teacherName || ''}</strong>
-              <button class="btn btn-sm btn-outline-secondary btn-edit-badge ms-2" onclick="openAdmEditModal(${index})">
+              <button class="btn btn-sm btn-outline-secondary btn-edit-badge ms-2" onclick="openAdmEditModal(${originalIndex})">
                 <i class="bi bi-pencil me-1"></i>Edit
               </button>
             </div>
@@ -1222,6 +1274,15 @@
         </div>
       `;
     }).join('');
+
+    document.getElementById('admPageIndicator').innerText = `Page ${currentAdmPage} of ${totalPages}`;
+    document.getElementById('admPrevBtn').disabled = (currentAdmPage === 1);
+    document.getElementById('admNextBtn').disabled = (currentAdmPage === totalPages);
+  }
+
+  function changeAdmPage(delta) {
+    currentAdmPage += delta;
+    renderAdmPage();
   }
 
   function openAdmEditModal(index) {
@@ -1298,9 +1359,8 @@
     const search = document.getElementById('searchTeacher').value.toLowerCase();
     const startDate = document.getElementById('filterStartDate').value;
     const endDate = document.getElementById('filterEndDate').value;
-    const c = document.getElementById('attLogsContainer');
 
-    const filtered = rawAttendanceData.filter(r => {
+    filteredAttData = rawAttendanceData.filter(r => {
       const matchName = (r.teacherName || '').toLowerCase().includes(search);
       let matchDate = true;
       if (r.timestamp) {
@@ -1311,12 +1371,30 @@
       return matchName && matchDate;
     });
 
-    if (!filtered || !filtered.length) {
+    currentAttPage = 1;
+    renderAttPage();
+  }
+
+  function renderAttPage() {
+    const c = document.getElementById('attLogsContainer');
+    const paginationControls = document.getElementById('attPaginationControls');
+
+    if (!filteredAttData || !filteredAttData.length) {
       c.innerHTML = '<div class="text-muted text-center py-3">No matching attendance records found.</div>';
+      paginationControls.classList.add('d-none');
       return;
     }
 
-    c.innerHTML = filtered.map(r => {
+    paginationControls.classList.remove('d-none');
+    const totalPages = Math.ceil(filteredAttData.length / PAGE_SIZE);
+
+    if (currentAttPage < 1) currentAttPage = 1;
+    if (currentAttPage > totalPages) currentAttPage = totalPages;
+
+    const startIdx = (currentAttPage - 1) * PAGE_SIZE;
+    const pageItems = filteredAttData.slice(startIdx, startIdx + PAGE_SIZE);
+
+    c.innerHTML = pageItems.map(r => {
       const isToFollow = r.driveLink === 'To Follow';
       const isNoLink = r.driveLink === 'N/A' || !r.driveLink;
 
@@ -1340,6 +1418,15 @@
         </div>
       `;
     }).join('');
+
+    document.getElementById('attPageIndicator').innerText = `Page ${currentAttPage} of ${totalPages}`;
+    document.getElementById('attPrevBtn').disabled = (currentAttPage === 1);
+    document.getElementById('attNextBtn').disabled = (currentAttPage === totalPages);
+  }
+
+  function changeAttPage(delta) {
+    currentAttPage += delta;
+    renderAttPage();
   }
 
   function promptExport(type) {
