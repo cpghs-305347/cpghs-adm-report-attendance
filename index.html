@@ -385,6 +385,7 @@
                   <option value="AP">AP</option>
                   <option value="TLE">TLE</option>
                   <option value="MAPEH">MAPEH</option>
+                  <option value="ESP">ESP</option>
                 </select>
               </div>
               <div class="col-6">
@@ -585,6 +586,7 @@
                 <option value="AP">AP</option>
                 <option value="TLE">TLE</option>
                 <option value="MAPEH">MAPEH</option>
+                <option value="ESP">ESP</option>
               </select>
             </div>
           </div>
@@ -825,6 +827,25 @@
       }
     }
     return str;
+  }
+
+  // Helper function to format timestamp into Philippine Standard Time (12-hour format)
+  function formatPSTDateTime(dateInput) {
+    if (!dateInput) return "";
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return dateInput;
+    
+    return d.toLocaleString('en-US', {
+      timeZone: 'Asia/Manila',
+      weekday: 'short',
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
   }
 
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -1397,6 +1418,9 @@
     c.innerHTML = pageItems.map(r => {
       const isToFollow = r.driveLink === 'To Follow';
       const isNoLink = r.driveLink === 'N/A' || !r.driveLink;
+      
+      // Clean, formatted Philippine Standard Time (12-hour format)
+      const formattedTimestamp = formatPSTDateTime(r.timestamp);
 
       return `
         <div class="record-card border-start border-4 ${r.logType==='TIME IN'?'border-success':'border-danger'}">
@@ -1404,7 +1428,7 @@
             <strong>${r.teacherName || ''}</strong>
             <span class="badge ${r.logType==='TIME IN'?'bg-success':'bg-danger'}">${r.logType || ''}</span>
           </div>
-          <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${r.timestamp || ''}</div>
+          <div class="small text-muted mb-2"><i class="bi bi-clock me-1"></i>${formattedTimestamp}</div>
           
           ${isToFollow ? `
             <button class="btn btn-sm btn-outline-warning text-dark fw-bold w-100" disabled>
