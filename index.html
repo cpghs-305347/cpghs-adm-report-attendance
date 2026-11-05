@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0284c7">
 
-  <!-- PWA Manifest & iOS App Support -->
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/cpghs-305347/cpghs-new-logo/main/cpghs%20new%20logo.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,9 +13,7 @@
   
   <title>CARLOS P. GARCIA HIGH SCHOOL - ADM & Attendance</title>
 
-  <!-- Bootstrap 5.3 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -72,7 +69,6 @@
     .header-title-text h1 { font-size: 0.95rem; font-weight: 800; margin: 0; }
     .header-title-text h2 { font-size: 0.78rem; color: var(--light-yellow); font-weight: 700; margin: 2px 0 0 0; }
 
-    /* Download App Banner Button */
     .btn-download-app {
       background: #ffffff;
       color: #0284c7;
@@ -89,22 +85,59 @@
       transition: all 0.2s ease;
     }
 
-    .btn-download-app:active {
-      transform: scale(0.97);
-    }
+    .btn-download-app:active { transform: scale(0.97); }
 
-    /* Primary Navigation Tabs */
+    /* Primary Navigation Container */
     .nav-tabs-container {
-      background: #e0f2fe;
-      padding: 4px;
-      border-radius: 12px;
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 14px;
       display: flex;
-      gap: 4px;
-      margin-bottom: 12px;
-      border: 1px solid #bae6fd;
+      gap: 6px;
+      margin-bottom: 14px;
+      border: 1px solid #cbd5e1;
     }
 
-    /* Sub Navigation Tabs Base */
+    .tab-btn {
+      flex: 1;
+      border: none;
+      height: 46px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    /* Color Distinction for Main Tabs */
+    .tab-btn-adm {
+      background: #ccfbf1;
+      color: #0f766e;
+      border: 1.5px solid #99f6e4;
+    }
+    .tab-btn-adm.active {
+      background: #0d9488 !important;
+      color: #ffffff !important;
+      border-color: #0d9488 !important;
+      box-shadow: 0 4px 10px rgba(13, 148, 136, 0.35);
+    }
+
+    .tab-btn-att {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1.5px solid #fde68a;
+    }
+    .tab-btn-att.active {
+      background: #d97706 !important;
+      color: #ffffff !important;
+      border-color: #d97706 !important;
+      box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35);
+    }
+
+    /* Sub Navigation Tabs */
     .sub-nav-tabs {
       padding: 4px;
       border-radius: 12px;
@@ -113,12 +146,7 @@
       margin-bottom: 12px;
     }
 
-    /* ADM Sub-Tabs (Teal & Cyan Palette) */
-    .sub-nav-adm {
-      background: #ccfbf1;
-      border: 1px solid #99f6e4;
-    }
-
+    .sub-nav-adm { background: #ccfbf1; border: 1px solid #99f6e4; }
     .sub-nav-adm .tab-btn { color: #0f766e; }
     .sub-nav-adm .tab-btn.active {
       background: #0d9488;
@@ -126,39 +154,12 @@
       box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
     }
 
-    /* Attendance Sub-Tabs (Amber & Warm Orange Palette) */
-    .sub-nav-att {
-      background: #fef3c7;
-      border: 1px solid #fde68a;
-    }
-
+    .sub-nav-att { background: #fef3c7; border: 1px solid #fde68a; }
     .sub-nav-att .tab-btn { color: #b45309; }
     .sub-nav-att .tab-btn.active {
       background: #d97706;
       color: #ffffff;
       box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
-    }
-
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      height: 44px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: #0369a1;
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      transition: all 0.2s ease;
-    }
-
-    .nav-tabs-container .tab-btn.active {
-      background: #ffffff;
-      color: var(--header-blue);
-      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.18);
     }
 
     .custom-card {
@@ -209,7 +210,13 @@
       margin-bottom: 10px;
     }
 
-    /* Custom Modal Window Styling */
+    .btn-edit-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
     .modal-content-custom {
       border: none;
       border-radius: 20px;
@@ -241,7 +248,6 @@
 </head>
 <body>
 
-<!-- Master Shared Teacher List Datalist -->
 <datalist id="teacherOptions">
   <option value="ABAD, MARY CRIS C."></option>
   <option value="ABE, ANGELICA AMOR M."></option>
@@ -277,7 +283,6 @@
   <option value="TORRE, EUCLID D."></option>
 </datalist>
 
-<!-- Sections List Datalist -->
 <datalist id="sectionOptions">
   <option value="7 - Lavender"></option>
   <option value="7 - Chamomile"></option>
@@ -300,26 +305,23 @@
 
 <div class="app-container">
 
-  <!-- Header Banner -->
   <div class="header-banner">
     <img src="https://raw.githubusercontent.com/cpghs-305347/cpghs-new-logo/main/cpghs%20new%20logo.png" alt="CPGHS Logo" class="school-logo">
     <div class="header-title-text">
       <h1>CARLOS P. GARCIA HIGH SCHOOL</h1>
       <h2>ADM & Attendance System</h2>
     </div>
-    
-    <!-- Download App Button -->
     <button class="btn-download-app" onclick="triggerAppInstall()">
       <i class="bi bi-download"></i> Download App (iOS / Android)
     </button>
   </div>
 
-  <!-- Primary Navigation -->
+  <!-- Distinct Color Navigation Tabs -->
   <div class="nav-tabs-container">
-    <button class="tab-btn active" id="tabAdmBtn" onclick="switchMainTab('adm')">
+    <button class="tab-btn tab-btn-adm active" id="tabAdmBtn" onclick="switchMainTab('adm')">
       <i class="bi bi-journal-text"></i> ADM System
     </button>
-    <button class="tab-btn" id="tabTeacherBtn" onclick="switchMainTab('teacher')">
+    <button class="tab-btn tab-btn-att" id="tabTeacherBtn" onclick="switchMainTab('teacher')">
       <i class="bi bi-clock-history"></i> Attendance
     </button>
   </div>
@@ -386,12 +388,9 @@
               </div>
             </div>
 
-            <!-- Combined Sections Selection Box (Shows when "Combined Sections" is selected) -->
             <div id="combinedSectionsContainer" class="d-none p-2 mb-2 rounded border" style="background:#f8fafc; border-color:#cbd5e1 !important;">
               <div class="small fw-bold text-primary mb-1"><i class="bi bi-check2-square me-1"></i> Select Combined Sections:</div>
-              <div class="row g-1" id="combinedCheckboxes">
-                <!-- Dynamically populated checkboxes -->
-              </div>
+              <div class="row g-1" id="combinedCheckboxes"></div>
             </div>
 
             <div class="mb-2">
@@ -423,7 +422,6 @@
         </div>
       </div>
 
-      <!-- ADM Monitoring Records & Filtering Section -->
       <div class="col-lg-7 d-none d-lg-block" id="admLogsCol">
         <div class="custom-card">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
@@ -433,7 +431,6 @@
             </button>
           </div>
 
-          <!-- Filter & Search Controls for ADM -->
           <div class="p-2 mb-3 rounded-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
             <div class="row g-2">
               <div class="col-12 col-md-6">
@@ -466,7 +463,6 @@
     </div>
 
     <div class="row g-3">
-      <!-- Attendance Form -->
       <div class="col-lg-5" id="attFormCol">
         <div class="custom-card">
           <div class="form-section-title"><i class="bi bi-alarm"></i> Teacher Time In / Out</div>
@@ -482,7 +478,6 @@
               <input type="text" class="form-control" id="attTeacherName" list="teacherOptions" placeholder="Select or type teacher name..." required autocomplete="off">
             </div>
 
-            <!-- Activity Lesson Drive Link Input + To Follow Checkbox -->
             <div class="mb-3">
               <label class="form-label">Activity Lesson Drive Link <span class="text-muted fw-normal">(Optional for Time Out)</span></label>
               <input type="url" class="form-control" id="attDriveLink" placeholder="https://drive.google.com/...">
@@ -503,7 +498,6 @@
         </div>
       </div>
 
-      <!-- Attendance Logs & Filtering / Export Section -->
       <div class="col-lg-7 d-none d-lg-block" id="attLogsCol">
         <div class="custom-card">
           <div class="d-flex justify-content-between align-items-center mb-2 pb-1 border-bottom">
@@ -513,7 +507,6 @@
             </button>
           </div>
 
-          <!-- Filter & Search Controls for Attendance -->
           <div class="p-2 mb-3 rounded-3" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
             <div class="row g-2">
               <div class="col-12 col-md-6">
@@ -533,10 +526,73 @@
       </div>
     </div>
   </div>
-
 </div>
 
-<!-- Portal PIN Security Lock Screen Modal -->
+<!-- Modal: Edit ADM Entry -->
+<div class="modal fade" id="editAdmModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered px-3">
+    <div class="modal-content modal-content-custom p-3">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="fw-bold text-primary mb-0"><i class="bi bi-pencil-square me-2"></i>Edit ADM Record</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-2">
+        <form id="editAdmForm">
+          <input type="hidden" id="editAdmTimestamp">
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Teacher Name</label>
+            <input type="text" class="form-control" id="editAdmTeacher" list="teacherOptions" required>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Activity Date</label>
+              <input type="date" class="form-control" id="editAdmDate" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Subject</label>
+              <select class="form-select" id="editAdmSubject" required>
+                <option value="Filipino">Filipino</option>
+                <option value="English">English</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="AP">AP</option>
+                <option value="TLE">TLE</option>
+                <option value="MAPEH">MAPEH</option>
+              </select>
+            </div>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Schedule</label>
+              <input type="text" class="form-control" id="editAdmSchedule" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Section</label>
+              <input type="text" class="form-control" id="editAdmSection" required>
+            </div>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Total Enrollment</label>
+            <input type="number" class="form-control" id="editAdmEnrollment" required>
+          </div>
+          <div class="row g-2 mb-2">
+            <div class="col-6"><label class="small text-success fw-bold">Modular</label><input type="number" class="form-control" id="editAdmModular"></div>
+            <div class="col-6"><label class="small text-primary fw-bold">Online</label><input type="number" class="form-control" id="editAdmOnline"></div>
+            <div class="col-6"><label class="small text-warning fw-bold">No Resp.</label><input type="number" class="form-control" id="editAdmNoResponse"></div>
+            <div class="col-6"><label class="small text-danger fw-bold">Excused</label><input type="number" class="form-control" id="editAdmExcused"></div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">MOV Link</label>
+            <input type="url" class="form-control" id="editAdmMovLink">
+          </div>
+          <button type="button" class="btn btn-custom-blue w-100" onclick="saveAdmEdit()">Update Record</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Portal PIN Security Modal -->
 <div class="modal fade" id="pinLockModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -545,8 +601,7 @@
           <i class="bi bi-shield-lock-fill fs-1"></i>
         </div>
         <h5 class="fw-bold text-dark mb-1">CPGHS Portal Access</h5>
-        <p class="text-secondary small mb-3">Enter Security PIN to unlock the dashboard:</p>
-        
+        <p class="text-secondary small mb-3">Enter Security PIN to unlock dashboard:</p>
         <form id="pinAuthForm" onsubmit="handlePortalPinVerification(event)">
           <div class="mb-3">
             <input type="password" class="form-control text-center fs-4 fw-bold" id="portalPinInput" maxlength="6" placeholder="••••" required autofocus style="letter-spacing: 6px;">
@@ -558,7 +613,7 @@
   </div>
 </div>
 
-<!-- Custom Pop-Up Status Modal -->
+<!-- Status Pop-Up Modal -->
 <div class="modal fade" id="statusModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -566,15 +621,15 @@
         <div id="modalIconContainer" class="modal-status-icon-wrapper modal-icon-success">
           <i id="modalIcon" class="bi bi-check-circle-fill fs-1"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-2" id="modalTitle">TIME IN Recorded Successfully!</h5>
-        <p class="text-secondary small mb-3" id="modalMessage">Your attendance log has been recorded.</p>
+        <h5 class="fw-bold text-dark mb-2" id="modalTitle">Recorded Successfully!</h5>
+        <p class="text-secondary small mb-3" id="modalMessage">Your log has been recorded.</p>
         <button type="button" class="btn btn-custom-blue w-100 py-2 fs-6" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Caution / Validation Pop-Up Modal (OK only) -->
+<!-- Caution Pop-Up Modal -->
 <div class="modal fade" id="cautionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -583,14 +638,14 @@
           <i class="bi bi-exclamation-triangle-fill fs-1"></i>
         </div>
         <h5 class="fw-bold text-dark mb-2" id="cautionTitle">Action Restricted</h5>
-        <p class="text-secondary small mb-3" id="cautionMessage">Please check your inputs before proceeding.</p>
+        <p class="text-secondary small mb-3" id="cautionMessage">Please check inputs.</p>
         <button type="button" class="btn btn-warning text-white fw-bold w-100 py-2 fs-6" data-bs-dismiss="modal" style="background-color: #ea580c; border: none;">Review Entry</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Caution Confirm Modal (Confirm / Cancel) -->
+<!-- Confirm Modal -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -598,8 +653,8 @@
         <div class="modal-status-icon-wrapper modal-icon-warning">
           <i class="bi bi-exclamation-triangle-fill fs-1"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-2" id="confirmTitle">Confirm Duplicate Time In</h5>
-        <p class="text-secondary small mb-3" id="confirmMessage">You already have timed in within the last 6 hours. Are you sure you want to proceed?</p>
+        <h5 class="fw-bold text-dark mb-2" id="confirmTitle">Confirm Action</h5>
+        <p class="text-secondary small mb-3" id="confirmMessage">Are you sure you want to proceed?</p>
         <div class="row g-2">
           <div class="col-6">
             <button type="button" class="btn btn-light border w-100 py-2 fs-6 fw-bold" data-bs-dismiss="modal">Cancel</button>
@@ -613,7 +668,7 @@
   </div>
 </div>
 
-<!-- Custom Admin Password Auth Modal -->
+<!-- Admin Password Check Modal -->
 <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -621,20 +676,15 @@
         <div class="modal-status-icon-wrapper modal-icon-security">
           <i class="bi bi-shield-lock-fill fs-1"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-1">Admin Security Check</h5>
-        <p class="text-secondary small mb-3">Please enter the admin password to download records:</p>
-        
+        <h5 class="fw-bold text-dark mb-1">Admin Check</h5>
+        <p class="text-secondary small mb-3">Enter admin password:</p>
         <form id="adminAuthForm" onsubmit="handlePasswordVerification(event)">
           <div class="mb-3">
             <input type="password" class="form-control text-center fs-5 fw-bold" id="adminPasswordInput" placeholder="••••" required autofocus style="letter-spacing: 4px;">
           </div>
           <div class="row g-2">
-            <div class="col-6">
-              <button type="button" class="btn btn-light border w-100 py-2 fs-6 fw-bold" data-bs-dismiss="modal">Cancel</button>
-            </div>
-            <div class="col-6">
-              <button type="submit" class="btn btn-custom-blue w-100 py-2 fs-6">OK</button>
-            </div>
+            <div class="col-6"><button type="button" class="btn btn-light border w-100 py-2 fs-6 fw-bold" data-bs-dismiss="modal">Cancel</button></div>
+            <div class="col-6"><button type="submit" class="btn btn-custom-blue w-100 py-2 fs-6">OK</button></div>
           </div>
         </form>
       </div>
@@ -642,7 +692,7 @@
   </div>
 </div>
 
-<!-- Install Instructions Modal -->
+<!-- App Install Instructions Modal -->
 <div class="modal fade" id="installModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-sm px-3">
     <div class="modal-content modal-content-custom text-center p-3">
@@ -650,10 +700,8 @@
         <div class="modal-status-icon-wrapper modal-icon-info">
           <i class="bi bi-phone-vibrate fs-1"></i>
         </div>
-        <h5 class="fw-bold text-dark mb-2" id="installTitle">Install CPGHS ADM App</h5>
-        <div class="text-secondary small text-start mb-3" id="installBody">
-          <!-- Dynamically populated via JS for iOS / Android -->
-        </div>
+        <h5 class="fw-bold text-dark mb-2" id="installTitle">Install ADM App</h5>
+        <div class="text-secondary small text-start mb-3" id="installBody"></div>
         <button type="button" class="btn btn-custom-blue w-100 py-2 fs-6" data-bs-dismiss="modal">Got it!</button>
       </div>
     </div>
@@ -664,10 +712,10 @@
 
 <script>
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBPp0OEwbTt0VYVjckXOV-CrBQY3CPDH2R6tfPrLyZSNPQvEKN6HbdwT_yFWDfpTyG/exec";
-  let statusModal, installModal, passwordModal, cautionModal, confirmModal, pinLockModal;
+  let statusModal, installModal, passwordModal, cautionModal, confirmModal, pinLockModal, editAdmModal;
   let rawAttendanceData = [];
   let rawAdmData = [];
-  let currentExportType = ""; // 'ADM' or 'ATTENDANCE'
+  let currentExportType = "";
   let deferredPrompt = null;
   let pendingAttendancePayload = null;
 
@@ -678,7 +726,6 @@
     "10 - Rizal", "10 - Bonifacio", "10 - Jacinto", "10 - Mabini"
   ];
 
-  // Render Combined Sections Checkboxes
   function initCombinedSectionsCheckboxes() {
     const container = document.getElementById('combinedCheckboxes');
     if (!container) return;
@@ -692,7 +739,6 @@
     `).join('');
   }
 
-  // Handle Section Combobox Change
   function handleSectionInput(input) {
     const container = document.getElementById('combinedSectionsContainer');
     if (input.value === "Combined Sections") {
@@ -703,7 +749,6 @@
     }
   }
 
-  // Update input text with selected checkboxes for combined sections
   function updateCombinedSectionValue() {
     const chks = document.querySelectorAll('.combined-sec-chk:checked');
     const selected = Array.from(chks).map(c => c.value);
@@ -716,7 +761,6 @@
     }
   }
 
-  // Toggle Drive Link Field disabled state based on "To Follow" checkbox
   function toggleToFollowLink(chk) {
     const driveInput = document.getElementById('attDriveLink');
     if (chk.checked) {
@@ -729,12 +773,9 @@
     }
   }
 
-  // Helper to format clean readable dates and strip GMT text strings
   function formatCleanDate(dateInput) {
     if (!dateInput) return "";
     const str = String(dateInput);
-    
-    // If string contains GMT or timezone parenthesis, clean it
     if (str.includes("GMT") || str.includes("(")) {
       const parsedDate = new Date(str);
       if (!isNaN(parsedDate.getTime())) {
@@ -742,8 +783,6 @@
       }
       return str.split("00:00:00")[0].trim();
     }
-    
-    // If ISO date format YYYY-MM-DD
     if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
       const parts = str.split('T')[0].split('-');
       const parsedDate = new Date(parts[0], parts[1] - 1, parts[2]);
@@ -751,11 +790,9 @@
         return parsedDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' });
       }
     }
-    
     return str;
   }
 
-  // Capture Android PWA install prompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
@@ -779,8 +816,8 @@
     cautionModal = new bootstrap.Modal(document.getElementById('cautionModal'));
     confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     pinLockModal = new bootstrap.Modal(document.getElementById('pinLockModal'));
+    editAdmModal = new bootstrap.Modal(document.getElementById('editAdmModal'));
 
-    // Check session security authentication
     if (!sessionStorage.getItem('portalUnlocked')) {
       pinLockModal.show();
     }
@@ -801,7 +838,6 @@
     });
   });
 
-  // Handle Portal Lock Screen PIN Submission
   function handlePortalPinVerification(e) {
     e.preventDefault();
     const inputPin = document.getElementById('portalPinInput').value;
@@ -825,66 +861,43 @@
         btn.disabled = false;
         btn.innerText = "Unlock Dashboard";
       } else {
-        showCautionModal("Access Denied", "Incorrect PIN entered. Access restricted.");
+        showCautionModal("Access Denied", "Incorrect PIN entered.");
         document.getElementById('portalPinInput').value = "";
         btn.disabled = false;
         btn.innerText = "Unlock Dashboard";
       }
     })
     .catch(() => {
-      showCautionModal("Connection Error", "Unable to verify PIN. Please check your internet connection.");
+      showCautionModal("Connection Error", "Unable to verify PIN.");
       btn.disabled = false;
       btn.innerText = "Unlock Dashboard";
     });
   }
 
-  // App Download Trigger Logic for iOS & Android
   function triggerAppInstall() {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        deferredPrompt = null;
-      });
+      deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
       return;
     }
-
     const installBody = document.getElementById('installBody');
     const installTitle = document.getElementById('installTitle');
-
     if (isIOS) {
-      installTitle.innerText = "Install on iOS (iPhone/iPad)";
-      installBody.innerHTML = `
-        <ol class="ps-3 mb-0">
-          <li class="mb-2">Tap the <strong>Share button</strong> <i class="bi bi-share text-primary"></i> at the bottom of Safari.</li>
-          <li class="mb-2">Scroll down and tap <strong>Add to Home Screen</strong> <i class="bi bi-plus-square text-primary"></i>.</li>
-          <li>Tap <strong>Add</strong> at top right to complete!</li>
-        </ol>
-      `;
+      installTitle.innerText = "Install on iOS";
+      installBody.innerHTML = `<ol class="ps-3 mb-0"><li class="mb-2">Tap <strong>Share</strong>.</li><li class="mb-2">Tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>!</li></ol>`;
     } else {
       installTitle.innerText = "Install on Android";
-      installBody.innerHTML = `
-        <ol class="ps-3 mb-0">
-          <li class="mb-2">Tap the <strong>3 dots menu</strong> <i class="bi bi-three-dots-vertical text-primary"></i> in Chrome.</li>
-          <li class="mb-2">Select <strong>Add to Home Screen</strong> or <strong>Install App</strong>.</li>
-          <li>Tap <strong>Install</strong> to add to your app launcher!</li>
-        </ol>
-      `;
+      installBody.innerHTML = `<ol class="ps-3 mb-0"><li class="mb-2">Tap <strong>3 dots menu</strong>.</li><li class="mb-2">Select <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Install</strong>!</li></ol>`;
     }
-
     installModal.show();
   }
 
   function showCustomModal(title, message, isSuccess = true) {
-    const titleEl = document.getElementById('modalTitle');
-    const msgEl = document.getElementById('modalMessage');
+    document.getElementById('modalTitle').innerText = title;
+    document.getElementById('modalMessage').innerText = message;
     const iconContainer = document.getElementById('modalIconContainer');
     const icon = document.getElementById('modalIcon');
-
-    titleEl.innerText = title;
-    msgEl.innerText = message;
-
     if (isSuccess) {
       iconContainer.className = "modal-status-icon-wrapper modal-icon-success";
       icon.className = "bi bi-check-circle-fill fs-1";
@@ -892,7 +905,6 @@
       iconContainer.className = "modal-status-icon-wrapper modal-icon-error";
       icon.className = "bi bi-exclamation-triangle-fill fs-1";
     }
-
     statusModal.show();
   }
 
@@ -943,33 +955,23 @@
     if (v === 'logs') loadAttLogs();
   }
 
-  // Submit ADM Form with Strict Tally vs Enrollment Check
   document.getElementById('monitoringForm').addEventListener('submit', function(e) {
     e.preventDefault();
-
     const enrollmentVal = parseInt(document.getElementById('enrollment').value || 0);
     const modularVal = parseInt(document.getElementById('modular').value || 0);
     const onlineVal = parseInt(document.getElementById('online').value || 0);
     const noResponseVal = parseInt(document.getElementById('noResponse').value || 0);
     const excusedVal = parseInt(document.getElementById('excused').value || 0);
-
     const totalProcessed = modularVal + onlineVal + noResponseVal + excusedVal;
 
-    // Strict Tally Guardrail Check
     if (totalProcessed > enrollmentVal) {
-      showCautionModal(
-        "Invalid Data Tally",
-        `The sum of student records (${totalProcessed}) exceeds the Total Enrollment (${enrollmentVal}). Please correct the entries before submitting.`
-      );
-      return; // Stop form submission
+      showCautionModal("Invalid Data Tally", `Sum of student records (${totalProcessed}) exceeds Total Enrollment (${enrollmentVal}).`);
+      return;
     }
 
     const secVal = document.getElementById('gradeSection').value;
     if (secVal === "Combined Sections") {
-      showCautionModal(
-        "Select Combined Sections",
-        "Please select at least one section from the Combined Sections list before submitting."
-      );
+      showCautionModal("Select Combined Sections", "Please select at least one section.");
       return;
     }
 
@@ -1001,28 +1003,25 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      showCustomModal("Record Submitted!", "ADM Activity entry recorded successfully.");
+      showCustomModal("Record Submitted!", "ADM Activity entry recorded.");
       document.getElementById('monitoringForm').reset();
       document.getElementById('combinedSectionsContainer').classList.add('d-none');
       btn.disabled = false; btn.innerText = "Submit ADM Record";
       setTimeout(loadAdmLogs, 1200);
       if (window.innerWidth < 992) switchAdmMobileView('logs');
     })
-    .catch(err => {
+    .catch(() => {
       showCustomModal("Submission Failed", "Unable to log ADM entry.", false);
       btn.disabled = false; btn.innerText = "Submit ADM Record";
     });
   });
 
-  // Submit Attendance (TIME IN / TIME OUT) with Validation Restrictions
   function submitAttendance(type) {
     const tName = document.getElementById('attTeacherName').value.trim();
     const isToFollow = document.getElementById('toFollowCheck').checked;
     let link = document.getElementById('attDriveLink').value.trim();
 
-    if (isToFollow) {
-      link = "To Follow";
-    }
+    if (isToFollow) link = "To Follow";
 
     if (!tName) {
       showCustomModal("Missing Information", "Please select or type Teacher Name.", false);
@@ -1033,19 +1032,14 @@
     const todayStr = now.toISOString().split('T')[0];
 
     if (type === 'TIME IN') {
-      // 1. Check if official time is before 5:30 AM
       const currentHour = now.getHours();
       const currentMinutes = now.getMinutes();
 
       if (currentHour < 5 || (currentHour === 5 && currentMinutes < 30)) {
-        showCautionModal(
-          "Time In Restricted",
-          "Official TIME IN is only allowed on or after 5:30 AM. Please wait for the official school opening time."
-        );
+        showCautionModal("Time In Restricted", "Official TIME IN is allowed on or after 5:30 AM.");
         return;
       }
 
-      // 2. Check if the teacher has ALREADY timed out today
       const todayTimeOutLogs = rawAttendanceData.filter(r => {
         const isSameTeacher = (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase();
         const isTimeOut = r.logType === 'TIME OUT';
@@ -1058,10 +1052,7 @@
       });
 
       if (todayTimeOutLogs.length > 0) {
-        showCautionModal(
-          "Attendance Completed Today",
-          "You have already recorded a TIME OUT for today. Additional TIME IN is not allowed today. Please wait for tomorrow after 5:30 AM."
-        );
+        showCautionModal("Attendance Completed Today", "You have already recorded a TIME OUT for today.");
         return;
       }
 
@@ -1070,19 +1061,13 @@
         return;
       }
 
-      // 3. Check if teacher has timed in within the last 6 hours
       const teacherTimeInLogs = rawAttendanceData.filter(r => 
-        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && 
-        r.logType === 'TIME IN'
+        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && r.logType === 'TIME IN'
       );
 
       const payload = {
         action: "submitAttendance",
-        data: { 
-          logType: type, 
-          teacherName: tName, 
-          driveLink: link || 'To Follow' 
-        }
+        data: { logType: type, teacherName: tName, driveLink: link || 'To Follow' }
       };
 
       if (teacherTimeInLogs.length > 0) {
@@ -1091,76 +1076,49 @@
 
         if (!isNaN(latestTimeIn.getTime())) {
           const timeDiffMs = now.getTime() - latestTimeIn.getTime();
-          const sixHoursMs = 6 * 60 * 60 * 1000;
-
-          if (timeDiffMs < sixHoursMs) {
-            showConfirmModal(
-              "Already Timed In",
-              "You already have timed in within the last 6 hours. Are you sure you want to proceed?",
-              { type: type, tName: tName, payload: payload }
-            );
+          if (timeDiffMs < 6 * 60 * 60 * 1000) {
+            showConfirmModal("Already Timed In", "You already timed in within the last 6 hours. Proceed?", { type: type, tName: tName, payload: payload });
             return;
           }
         }
       }
 
-      // Proceed directly if no recent time-in conflict
       executeAttendanceSubmission(type, tName, payload);
 
     } else if (type === 'TIME OUT') {
-      // Find the most recent TIME IN record for this teacher
       const teacherLogs = rawAttendanceData.filter(r => 
-        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && 
-        r.logType === 'TIME IN'
+        (r.teacherName || '').trim().toLowerCase() === tName.toLowerCase() && r.logType === 'TIME IN'
       );
 
       if (!teacherLogs || teacherLogs.length === 0) {
-        showCautionModal(
-          "TIME IN Required First",
-          "You must TIME IN first before recording a TIME OUT. No active Time In record was found for your name."
-        );
+        showCautionModal("TIME IN Required First", "You must TIME IN first before recording TIME OUT.");
         return;
       }
 
-      // Sort logs by timestamp descending to get latest Time In
       teacherLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
       const latestTimeIn = new Date(teacherLogs[0].timestamp);
 
       if (!isNaN(latestTimeIn.getTime())) {
         const timeDiffMs = now.getTime() - latestTimeIn.getTime();
         const sixHoursMs = 6 * 60 * 60 * 1000;
-
         if (timeDiffMs < sixHoursMs) {
           const remainingMs = sixHoursMs - timeDiffMs;
           const remainingHours = Math.floor(remainingMs / (1000 * 60 * 60));
           const remainingMins = Math.ceil((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
-
-          let timeStr = "";
-          if (remainingHours > 0) timeStr += `${remainingHours} hr `;
-          timeStr += `${remainingMins} min`;
-
-          showCautionModal(
-            "6 Hours Completion Required",
-            `TIME OUT is only allowed after completing a full 6 hours from your TIME IN. Please wait another ${timeStr} before timing out.`
-          );
+          showCautionModal("6 Hours Completion Required", `Please wait another ${remainingHours > 0 ? remainingHours + ' hr ' : ''}${remainingMins} min before timing out.`);
           return;
         }
       }
 
       const payload = {
         action: "submitAttendance",
-        data: { 
-          logType: type, 
-          teacherName: tName, 
-          driveLink: link || 'N/A' 
-        }
+        data: { logType: type, teacherName: tName, driveLink: link || 'N/A' }
       };
 
       executeAttendanceSubmission(type, tName, payload);
     }
   }
 
-  // Execute actual submission to backend
   function executeAttendanceSubmission(type, tName, payload) {
     fetch(SCRIPT_URL, {
       method: 'POST',
@@ -1169,22 +1127,18 @@
       body: JSON.stringify(payload)
     })
     .then(() => {
-      showCustomModal(type + " Recorded Successfully!", "Record saved for " + tName + ".", true);
+      showCustomModal(type + " Recorded!", "Record saved for " + tName + ".", true);
       document.getElementById('attendanceForm').reset();
-      
-      // Reset To Follow checkbox state
       const chk = document.getElementById('toFollowCheck');
       if (chk) { chk.checked = false; toggleToFollowLink(chk); }
-
       setTimeout(loadAttLogs, 1200);
       if (window.innerWidth < 992) switchAttMobileView('logs');
     })
-    .catch(err => {
-      showCustomModal("Error", "Could not record attendance. Please try again.", false);
+    .catch(() => {
+      showCustomModal("Error", "Could not record attendance.", false);
     });
   }
 
-  // Load ADM Logs into raw array & render
   function loadAdmLogs() {
     const c = document.getElementById('admLogsContainer');
     c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading logs...</div>';
@@ -1200,7 +1154,6 @@
       });
   }
 
-  // Live Search & Date Filter Function for ADM Monitoring Records
   function filterAdmLogs() {
     const search = document.getElementById('searchAdmTeacher').value.toLowerCase();
     const startDate = document.getElementById('filterAdmStartDate').value;
@@ -1210,13 +1163,11 @@
     const filtered = rawAdmData.filter(r => {
       const matchName = (r.teacherName || '').toLowerCase().includes(search);
       let matchDate = true;
-
       const recDateStr = r.activityDate || (r.timestamp ? new Date(r.timestamp).toISOString().split('T')[0] : '');
       if (recDateStr) {
         if (startDate && recDateStr < startDate) matchDate = false;
         if (endDate && recDateStr > endDate) matchDate = false;
       }
-
       return matchName && matchDate;
     });
 
@@ -1225,38 +1176,36 @@
       return;
     }
 
-    c.innerHTML = filtered.map(r => {
-      // Calculate engagement tally vs enrollment for Progress Bar
+    c.innerHTML = filtered.map((r, index) => {
       const totalEnrollment = parseInt(r.enrollment || 0) || 0;
       const modularCount = parseInt(r.modular || 0) || 0;
       const onlineCount = parseInt(r.online || 0) || 0;
       const noResponseCount = parseInt(r.noResponse || 0) || 0;
       const excusedCount = parseInt(r.excused || 0) || 0;
-      
       const totalEngaged = modularCount + onlineCount + noResponseCount + excusedCount;
       
       let percent = 0;
       if (totalEnrollment > 0) {
         percent = Math.min(100, Math.round((totalEngaged / totalEnrollment) * 100));
-      } else if (r.progressBar) {
-        percent = parseInt(r.progressBar.replace('%', '')) || 0;
       }
 
-      // Format clean date string without GMT noise
       const cleanDate = formatCleanDate(r.activityDate || r.timestamp);
 
       return `
         <div class="record-card">
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <strong>${r.teacherName || ''}</strong>
+            <div>
+              <strong>${r.teacherName || ''}</strong>
+              <button class="btn btn-sm btn-outline-secondary btn-edit-badge ms-2" onclick="openAdmEditModal(${index})">
+                <i class="bi bi-pencil me-1"></i>Edit
+              </button>
+            </div>
             <span class="badge bg-primary">${r.subject || ''}</span>
           </div>
           <div class="small text-muted mb-2">
             <i class="bi bi-calendar-event me-1"></i>${cleanDate} 
             ${r.timeSchedule ? `(${r.timeSchedule})` : ''} - <strong>${r.gradeSection || ''}</strong>
           </div>
-
-          <!-- Engagement Progress Bar -->
           <div class="mb-2 p-2 rounded-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
             <div class="d-flex justify-content-between align-items-center mb-1 small">
               <span class="fw-bold text-secondary">Total Processed / Enrolled: ${totalEngaged} / ${totalEnrollment}</span>
@@ -1264,15 +1213,9 @@
             </div>
             <div class="progress" style="height: 8px;">
               <div class="progress-bar ${percent >= 75 ? 'bg-success' : percent >= 50 ? 'bg-primary' : 'bg-warning'}" 
-                   role="progressbar" 
-                   style="width: ${percent}%;" 
-                   aria-valuenow="${percent}" 
-                   aria-valuemin="0" 
-                   aria-valuemax="100">
-              </div>
+                   role="progressbar" style="width: ${percent}%;"></div>
             </div>
           </div>
-
           <a href="${r.movLink || '#'}" target="_blank" class="btn btn-sm btn-outline-primary w-100 ${!r.movLink || r.movLink === '#' ? 'disabled' : ''}">
             <i class="bi bi-folder2-open me-1"></i> View MOV Drive Link
           </a>
@@ -1281,7 +1224,61 @@
     }).join('');
   }
 
-  // Fetch Attendance Logs into raw array & render
+  function openAdmEditModal(index) {
+    const item = rawAdmData[index];
+    if (!item) return;
+
+    document.getElementById('editAdmTimestamp').value = item.timestamp || '';
+    document.getElementById('editAdmTeacher').value = item.teacherName || '';
+    document.getElementById('editAdmDate').value = item.activityDate || '';
+    document.getElementById('editAdmSubject').value = item.subject || 'Filipino';
+    document.getElementById('editAdmSchedule').value = item.timeSchedule || '';
+    document.getElementById('editAdmSection').value = item.gradeSection || '';
+    document.getElementById('editAdmEnrollment').value = item.enrollment || 0;
+    document.getElementById('editAdmModular').value = item.modular || 0;
+    document.getElementById('editAdmOnline').value = item.online || 0;
+    document.getElementById('editAdmNoResponse').value = item.noResponse || 0;
+    document.getElementById('editAdmExcused').value = item.excused || 0;
+    document.getElementById('editAdmMovLink').value = item.movLink || '';
+
+    editAdmModal.show();
+  }
+
+  function saveAdmEdit() {
+    const payload = {
+      action: "updateADM",
+      data: {
+        timestamp: document.getElementById('editAdmTimestamp').value,
+        teacherName: document.getElementById('editAdmTeacher').value,
+        activityDate: document.getElementById('editAdmDate').value,
+        subject: document.getElementById('editAdmSubject').value,
+        timeSchedule: document.getElementById('editAdmSchedule').value,
+        gradeSection: document.getElementById('editAdmSection').value,
+        enrollment: document.getElementById('editAdmEnrollment').value,
+        modular: document.getElementById('editAdmModular').value,
+        online: document.getElementById('editAdmOnline').value,
+        noResponse: document.getElementById('editAdmNoResponse').value,
+        excused: document.getElementById('editAdmExcused').value,
+        movLink: document.getElementById('editAdmMovLink').value
+      }
+    };
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    })
+    .then(() => {
+      editAdmModal.hide();
+      showCustomModal("Record Updated!", "ADM entry successfully updated.");
+      setTimeout(loadAdmLogs, 1200);
+    })
+    .catch(() => {
+      showCustomModal("Update Failed", "Unable to update ADM record.", false);
+    });
+  }
+
   function loadAttLogs() {
     const c = document.getElementById('attLogsContainer');
     c.innerHTML = '<div class="text-muted text-center py-3"><div class="spinner-border spinner-border-sm me-2"></div>Loading attendance logs...</div>';
@@ -1297,7 +1294,6 @@
       });
   }
 
-  // Live Search & Date Filter Function for Attendance
   function filterAttendanceLogs() {
     const search = document.getElementById('searchTeacher').value.toLowerCase();
     const startDate = document.getElementById('filterStartDate').value;
@@ -1307,13 +1303,11 @@
     const filtered = rawAttendanceData.filter(r => {
       const matchName = (r.teacherName || '').toLowerCase().includes(search);
       let matchDate = true;
-
       if (r.timestamp) {
         const logDateStr = new Date(r.timestamp).toISOString().split('T')[0];
         if (startDate && logDateStr < startDate) matchDate = false;
         if (endDate && logDateStr > endDate) matchDate = false;
       }
-
       return matchName && matchDate;
     });
 
@@ -1348,14 +1342,12 @@
     }).join('');
   }
 
-  // Prompt Export Function
   function promptExport(type) {
     currentExportType = type;
     document.getElementById('adminPasswordInput').value = '';
     passwordModal.show();
   }
 
-  // Handle Custom Password Form Submission & Route to Correct CSV Generator
   function handlePasswordVerification(e) {
     e.preventDefault();
     const ADMIN_PASSWORD = "1111";
@@ -1365,24 +1357,20 @@
 
     if (inputPass !== ADMIN_PASSWORD) {
       setTimeout(() => {
-        showCustomModal("Access Denied", "Incorrect admin password. Download aborted.", false);
+        showCustomModal("Access Denied", "Incorrect admin password.", false);
       }, 300);
       return;
     }
 
     setTimeout(() => {
-      if (currentExportType === 'ADM') {
-        exportADMCSV();
-      } else if (currentExportType === 'ATTENDANCE') {
-        exportAttendanceCSV();
-      }
+      if (currentExportType === 'ADM') exportADMCSV();
+      else if (currentExportType === 'ATTENDANCE') exportAttendanceCSV();
     }, 300);
   }
 
-  // CSV Generator for ADM Logs
   function exportADMCSV() {
     if (!rawAdmData || !rawAdmData.length) {
-      showCustomModal("Export Error", "No ADM data available to download.", false);
+      showCustomModal("Export Error", "No ADM data available.", false);
       return;
     }
 
@@ -1418,10 +1406,9 @@
     document.body.removeChild(link);
   }
 
-  // CSV Generator for Attendance Logs
   function exportAttendanceCSV() {
     if (!rawAttendanceData || !rawAttendanceData.length) {
-      showCustomModal("Export Error", "No attendance data available to download.", false);
+      showCustomModal("Export Error", "No attendance data available.", false);
       return;
     }
 
